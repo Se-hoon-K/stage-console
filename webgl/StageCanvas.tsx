@@ -14,6 +14,8 @@ export function StageCanvas() {
   return (
     <Canvas
       dpr={[1, 2]}
+      eventSource={document.body}
+      eventPrefix="client"
       frameloop={visible ? 'always' : 'never'}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       camera={{ fov: 35, position: [0, 7, 30], near: 0.1, far: 200 }}
