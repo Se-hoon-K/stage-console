@@ -37,13 +37,12 @@ export function generateStage(seed: number): Stage {
 
   const frontZ = depth / 2 - BEAM / 2
   const span = width + 2 * BEAM
-  const zero: Vec3 = [0, 0, 0]
 
   const deck: Draft[] = [
-    { id: 'deck-main', kind: 'deck', position: [0, DECK_H / 2, 0], rotation: zero, size: [width, DECK_H, depth] },
+    { id: 'deck-main', kind: 'deck', position: [0, DECK_H / 2, 0], rotation: [0, 0, 0], size: [width, DECK_H, depth] },
   ]
   if (thrust) {
-    deck.push({ id: 'deck-thrust', kind: 'deck', position: [0, DECK_H / 2, depth / 2 + 1.5], rotation: zero, size: [2, DECK_H, 3] })
+    deck.push({ id: 'deck-thrust', kind: 'deck', position: [0, DECK_H / 2, depth / 2 + 1.5], rotation: [0, 0, 0], size: [2, DECK_H, 3] })
   }
 
   const truss: Draft[] = []
@@ -54,20 +53,21 @@ export function generateStage(seed: number): Stage {
         id: `tower-${side < 0 ? 'l' : 'r'}-${z > 0 ? 'f' : 'b'}`,
         kind: 'truss',
         position: [side * (width / 2 + BEAM / 2), trussH / 2, z],
-        rotation: zero,
+        rotation: [0, 0, 0],
         size: [BEAM, trussH, BEAM],
       })
     }
   }
   const segments = Math.ceil(span / SEGMENT)
   const segLen = span / segments
-  for (const z of [frontZ, -frontZ]) {
+  const beamZs = fourTowers ? [frontZ, -frontZ] : [frontZ]
+  for (const z of beamZs) {
     for (let i = 0; i < segments; i++) {
       truss.push({
         id: `beam-${z > 0 ? 'f' : 'b'}-${i}`,
         kind: 'truss',
         position: [-span / 2 + segLen * (i + 0.5), trussH + BEAM / 2, z],
-        rotation: zero,
+        rotation: [0, 0, 0],
         size: [segLen, BEAM, BEAM],
       })
     }
@@ -80,25 +80,27 @@ export function generateStage(seed: number): Stage {
         id: `spk-${side < 0 ? 'l' : 'r'}-${i}`,
         kind: 'speaker',
         position: [side * (width / 2 + 1.4), trussH - 0.6 - i * 0.55, depth / 2],
-        rotation: zero,
+        rotation: [0, 0, 0],
         size: [1, 0.5, 0.8],
       })
     }
   }
 
   const lights: Draft[] = []
-  const front = Math.ceil(hungLights / 2)
-  const rows: [number, number][] = [
-    [frontZ, front],
-    [-frontZ, hungLights - front],
-  ]
+  const front = fourTowers ? Math.ceil(hungLights / 2) : hungLights
+  const rows: [number, number][] = fourTowers
+    ? [
+        [frontZ, front],
+        [-frontZ, hungLights - front],
+      ]
+    : [[frontZ, front]]
   for (const [z, count] of rows) {
     for (let i = 0; i < count; i++) {
       lights.push({
         id: `light-${z > 0 ? 'f' : 'b'}-${i}`,
         kind: 'light',
         position: [-width / 2 + (width * (i + 0.5)) / count, trussH - 0.4, z],
-        rotation: zero,
+        rotation: [0, 0, 0],
         size: [0.4, 0.6, 0.4],
       })
     }
@@ -108,7 +110,7 @@ export function generateStage(seed: number): Stage {
       id: `wash-${i}`,
       kind: 'light',
       position: [-width / 2 + (width * (i + 0.5)) / washes, DECK_H + 0.15, depth / 2 - 0.3],
-      rotation: zero,
+      rotation: [0, 0, 0],
       size: [0.3, 0.3, 0.3],
     })
   }
@@ -119,7 +121,7 @@ export function generateStage(seed: number): Stage {
           id: 'screen',
           kind: 'screen',
           position: [0, DECK_H + trussH * 0.35, -depth / 2 + 0.3],
-          rotation: zero,
+          rotation: [0, 0, 0],
           size: [width * 0.7, trussH * 0.5, 0.2],
         },
       ]
