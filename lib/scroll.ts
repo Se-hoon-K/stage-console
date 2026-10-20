@@ -28,17 +28,21 @@ function startGlide() {
 export function scrollToCue(n: number): boolean {
   const el = document.getElementById(`cue-${n}`)
   if (!el) return false
+  // The pinned hero section is position: fixed, so scrolling to it is a no-op; go to the top instead.
+  const top = n === 1
 
   if (lenis) {
     startGlide()
-    lenis.scrollTo(el, { duration: 1.2, onComplete: endGlide })
+    lenis.scrollTo(top ? 0 : el, { duration: 1.2, onComplete: endGlide })
   } else if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     endGlide()
-    el.scrollIntoView({ behavior: 'auto' })
+    if (top) window.scrollTo({ top: 0, behavior: 'auto' })
+    else el.scrollIntoView({ behavior: 'auto' })
   } else {
     startGlide()
     window.addEventListener('scrollend', endGlide, { once: true })
-    el.scrollIntoView({ behavior: 'smooth' })
+    if (top) window.scrollTo({ top: 0, behavior: 'smooth' })
+    else el.scrollIntoView({ behavior: 'smooth' })
   }
   el.focus({ preventScroll: true })
   return true

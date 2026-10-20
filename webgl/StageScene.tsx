@@ -10,6 +10,7 @@ import { consoleStore } from '@/console/store'
 import { lightsOn, partOffset } from '@/stage/assembly'
 import { generateStage, type Part } from '@/stage/generateStage'
 import { lightLevel } from '@/stage/lighting'
+import { fitDistance } from '@/stage/camera'
 import { stageView, useStageView } from '@/stage/view'
 import { createBeamMaterial } from './beamMaterial'
 
@@ -55,7 +56,7 @@ function Bodies({ kind, parts }: { kind: BodyKind; parts: Part[] }) {
   )
 }
 
-function Rig({ lights }: { lights: Part[] }) {
+function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
   const lensRef = useRef<THREE.InstancedMesh>(null)
   const beamRef = useRef<THREE.InstancedMesh>(null)
   const washRef = useRef<THREE.PointLight>(null)
@@ -101,9 +102,10 @@ function Rig({ lights }: { lights: Part[] }) {
     for (let i = 0; i < lights.length; i++) {
       const p = lights[i]
       const on = lightsOn(progress, i, lights.length)
-      const level =
-        lightLevel({ progress, index: i, count: lights.length, time, tempo: c.tempo }) * c.master * c.intensity +
-        flash.value * on
+      const base = reduced
+        ? on * 0.85 * c.master * c.intensity // steady: no chase under reduced motion
+        : lightLevel({ progress, index: i, count: lights.length, time, tempo: c.tempo }) * c.master * c.intensity
+      const level = base + flash.value * on
       levels.setX(i, level)
       sum += level
 
@@ -115,7 +117,7 @@ function Rig({ lights }: { lights: Part[] }) {
 
       const hung = p.position[1] > BEAM_MIN_HEIGHT
       const h = hung ? obj.position.y : 0
-      obj.rotation.set(0, 0, hung ? Math.sin(time * 0.6 + i) * 0.25 : 0)
+      obj.rotation.set(0, 0, hung && !reduced ? Math.sin(time * 0.6 + i) * 0.25 : 0)
       obj.scale.set(h, h, h)
       obj.updateMatrix()
       beams.setMatrixAt(i, obj.matrix)
@@ -171,7 +173,10 @@ export function StageScene() {
 
     const p = Math.min(progress / 0.8, 1)
     const live = progress >= 1 && !reduced
-    camTarget.set(live ? state.pointer.x * 0.8 : 0, 7 - 2.5 * p + (live ? state.pointer.y * 0.4 : 0), 30 - 11 * p)
+    const fitZ = fitDistance(stage.bounds[0], (state.camera as THREE.PerspectiveCamera).fov, state.size.width / state.size.height)
+    const startZ = Math.max(30, fitZ * 1.4)
+    const endZ = Math.max(19, fitZ)
+    camTarget.set(live ? state.pointer.x * 0.8 : 0, 7 - 2.5 * p + (live ? state.pointer.y * 0.4 : 0), startZ + (endZ - startZ) * p)
     state.camera.position.lerp(camTarget, reduced ? 1 : 0.08)
     state.camera.lookAt(0, 3, 0)
 
@@ -186,7 +191,7 @@ export function StageScene() {
       <directionalLight position={[6, 12, 10]} intensity={0.8} />
       <group key={seed}>
         {BODY_KINDS.map((k) => groups[k].length > 0 && <Bodies key={k} kind={k} parts={groups[k]} />)}
-        <Rig lights={groups.light} />
+        <Rig lights={groups.light} reduced={reduced} />
       </group>
       {!lite && (
         <EffectComposer multisampling={0}>

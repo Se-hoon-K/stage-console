@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { type PointerEvent, useMemo, useRef, useState } from 'react'
 import { useConsole } from '@/console/store'
 import type { Show } from '@/content/shows'
 import { generateStage } from '@/stage/generateStage'
@@ -13,15 +13,19 @@ export function WorkList({ shows }: { shows: Show[] }) {
   const stages = useMemo(() => new Map(shows.map((s) => [s.slug, generateStage(s.seed)])), [shows])
   const activeStage = active ? stages.get(active) : undefined
 
+  // Ref write (no re-render); keeps the preview inside the container's right edge.
+  const place = (e: PointerEvent<HTMLElement>, container: HTMLElement) => {
+    const el = preview.current
+    if (!el) return
+    const box = container.getBoundingClientRect()
+    const x = Math.max(0, Math.min(e.clientX - box.left + 24, box.width - el.offsetWidth))
+    el.style.transform = `translate(${x}px, ${e.clientY - box.top - 80}px)`
+  }
+
   return (
     <div
       className="relative mt-12"
-      onPointerMove={(e) => {
-        const el = preview.current
-        if (!el) return
-        const box = e.currentTarget.getBoundingClientRect()
-        el.style.transform = `translate(${e.clientX - box.left + 24}px, ${e.clientY - box.top - 80}px)`
-      }}
+      onPointerMove={(e) => place(e, e.currentTarget)}
       onPointerLeave={() => setActive(null)}
     >
       <ol className="border-t border-line">
@@ -29,7 +33,10 @@ export function WorkList({ shows }: { shows: Show[] }) {
           <li
             key={s.slug}
             data-active={active === s.slug}
-            onPointerEnter={() => setActive(s.slug)}
+            onPointerEnter={(e) => {
+              setActive(s.slug)
+              place(e, e.currentTarget.closest('ol')!.parentElement!)
+            }}
             className="work-row grid grid-cols-[3rem_1fr] items-baseline gap-x-4 gap-y-1 border-b border-line py-5 md:grid-cols-[4rem_minmax(0,2fr)_1fr_5rem_7rem_8rem]"
           >
             <span className="label">

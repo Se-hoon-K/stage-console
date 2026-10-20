@@ -39,6 +39,14 @@ describe('scrollToCue', () => {
     expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled()
   })
 
+  it('scrolls to the top for cue 1, since the pinned hero is fixed', () => {
+    document.body.innerHTML = '<section id="cue-1" tabindex="-1"></section>'
+    const scrollTo = vi.fn()
+    setLenis({ scrollTo } as unknown as Lenis)
+    scrollToCue(1)
+    expect(scrollTo).toHaveBeenCalledWith(0, expect.objectContaining({ duration: 1.2 }))
+  })
+
   it('reports a glide until Lenis completes', () => {
     let done: (() => void) | undefined
     setLenis({ scrollTo: (_el: unknown, opts: { onComplete: () => void }) => (done = opts.onComplete) } as unknown as Lenis)

@@ -14,7 +14,7 @@ export function HeroStage() {
   const stage = useMemo(() => generateStage(agency.heroSeed), [])
   const hue = useConsole((s) => s.hue)
   const webglReady = useStageView((s) => s.webglReady)
-  const progress = useStageView((s) => s.progress)
+  const percent = useStageView((s) => Math.round(s.progress * 100))
 
   useEffect(() => {
     const section = ref.current?.closest('section')
@@ -29,11 +29,14 @@ export function HeroStage() {
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       stageView.set({ progress: 1 })
-      return () => io?.disconnect()
+      return () => {
+        io?.disconnect()
+        stageView.set({ visible: false })
+      }
     }
 
     const ctx = gsap.context(() => {
-      ScrollTrigger.create({
+      const trigger = ScrollTrigger.create({
         trigger: section,
         start: 'top top',
         end: '+=150%',
@@ -41,6 +44,7 @@ export function HeroStage() {
         scrub: true,
         onUpdate: (self) => stageView.set({ progress: self.progress }),
       })
+      stageView.set({ progress: trigger.progress })
       const title = section.querySelector('h1')
       if (title) {
         const split = SplitText.create(title, { type: 'lines,chars', mask: 'lines' })
@@ -51,10 +55,11 @@ export function HeroStage() {
     return () => {
       ctx.revert()
       io?.disconnect()
+      stageView.set({ visible: false })
     }
   }, [])
 
-  const built = assembledCount(stage, progress)
+  const built = assembledCount(stage, percent / 100)
 
   return (
     <div ref={ref} className="pointer-events-none absolute inset-0 -z-10">
@@ -68,7 +73,7 @@ export function HeroStage() {
         lights follow the show console.
       </p>
       <div className="label absolute right-5 top-6 space-y-1 text-right md:right-10" aria-hidden="true">
-        <p>ASSEMBLY {String(Math.round(progress * 100)).padStart(3, '0')}%</p>
+        <p>ASSEMBLY {String(percent).padStart(3, '0')}%</p>
         <p>
           PARTS {built}/{stage.parts.length}
         </p>

@@ -15,7 +15,8 @@ export const gsap = {
 }
 
 export const ScrollTrigger = {
-  create: vi.fn(() => ({ kill: vi.fn() })),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- param types the recorded call args
+  create: vi.fn((_config?: unknown) => ({ progress: 0, kill: vi.fn() })),
   update: vi.fn(),
   refresh: vi.fn(),
 }
