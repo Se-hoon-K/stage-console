@@ -52,6 +52,23 @@ describe('HeroStage', () => {
     expect(stageView.get().progress).toBe(0.64)
   })
 
+  it('syncs progress from the trigger on mount and hides the stage on unmount', () => {
+    stageView.set({ progress: 1 })
+    const { unmount } = renderInSection()
+    expect(stageView.get().progress).toBe(0)
+    expect(stageView.get().visible).toBe(true)
+    unmount()
+    expect(stageView.get().visible).toBe(false)
+  })
+
+  it('hides the stage on unmount under reduced motion too', () => {
+    vi.mocked(window.matchMedia).mockImplementation(
+      (q: string) => ({ matches: q.includes('reduce'), media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }) as unknown as MediaQueryList,
+    )
+    renderInSection().unmount()
+    expect(stageView.get().visible).toBe(false)
+  })
+
   it('shows the assembled stage without pinning under reduced motion', () => {
     vi.mocked(window.matchMedia).mockImplementation(
       (q: string) => ({ matches: q.includes('reduce'), media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }) as unknown as MediaQueryList,

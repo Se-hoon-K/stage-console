@@ -4,16 +4,14 @@ import { Canvas } from '@react-three/fiber'
 import { useState } from 'react'
 import { stageView, useStageView } from '@/stage/view'
 import { StageScene } from './StageScene'
-import { canUseWebGL } from './support'
 
 export function StageCanvas() {
   const visible = useStageView((s) => s.visible)
-  const [supported] = useState(() => canUseWebGL())
-  if (!supported) return null
+  const [lite] = useState(() => window.matchMedia('(max-width: 767px)').matches)
 
   return (
     <Canvas
-      dpr={[1, 2]}
+      dpr={lite ? [1, 1.5] : [1, 2]}
       eventSource={document.body}
       eventPrefix="client"
       frameloop={visible ? 'always' : 'never'}

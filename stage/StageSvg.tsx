@@ -1,11 +1,11 @@
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { toElevation } from './elevation'
 import type { Stage } from './generateStage'
 
 type Props = { stage: Stage; hue: number; className?: string }
 
 /** Static front elevation: the no-WebGL fallback and the Work list preview. */
-export function StageSvg({ stage, hue, className }: Props) {
+export const StageSvg = memo(function StageSvg({ stage, hue, className }: Props) {
   const el = useMemo(() => toElevation(stage), [stage])
   return (
     <svg viewBox={el.viewBox} className={className} aria-hidden="true" preserveAspectRatio="xMidYMax meet">
@@ -29,4 +29,4 @@ export function StageSvg({ stage, hue, className }: Props) {
       ))}
     </svg>
   )
-}
+})

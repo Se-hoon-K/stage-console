@@ -5,7 +5,9 @@ export function canUseWebGL(): boolean {
   if (cached !== null) return cached
   try {
     const canvas = document.createElement('canvas')
-    cached = Boolean(canvas.getContext('webgl2') ?? canvas.getContext('webgl'))
+    const ctx = canvas.getContext('webgl2') ?? canvas.getContext('webgl')
+    cached = Boolean(ctx)
+    ;(ctx as WebGLRenderingContext | null)?.getExtension?.('WEBGL_lose_context')?.loseContext()
   } catch {
     cached = false
   }
