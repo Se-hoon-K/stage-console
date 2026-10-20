@@ -6,6 +6,7 @@ import { Console } from './Console'
 
 vi.mock('@/lib/scroll', () => ({ scrollToCue: vi.fn(() => true) }))
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }))
+vi.mock('@/console/audio', () => ({ initAudio: vi.fn(), playPad: vi.fn(), playClick: vi.fn(), readLevel: () => 0 }))
 
 describe('Console', () => {
   beforeEach(() => {
