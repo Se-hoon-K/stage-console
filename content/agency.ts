@@ -9,6 +9,7 @@ export const agency: {
   services: Service[]
   email: string
   city: string
+  heroSeed: number
   credits: Credits
 } = {
   name: '[AGENCY]',
@@ -47,6 +48,7 @@ export const agency: {
   ],
   email: 'hello@example.com',
   city: 'Melbourne',
+  heroSeed: 7,
   credits: {
     author: 'Sehoon Ko',
     github: 'https://github.com/Se-hoon-K',
