@@ -1,1 +1,90 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@theme {
+  --color-stage: #0e0e0e;
+  --color-panel: #1a1a1a;
+  --color-line: #2e2e2e;
+  --color-ink: #edebe6;
+  --color-mute: #8a8780;
+  --color-paper: #edebe6;
+  --color-led: #ff3b1f;
+
+  --font-display: var(--font-archivo), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --ease-mechanical: cubic-bezier(0.7, 0, 0.2, 1);
+
+  --radius-*: initial;
+}
+
+:root {
+  --console-h: 104px;
+}
+
+html {
+  background: var(--color-stage);
+  color: var(--color-ink);
+}
+
+body {
+  min-height: 100dvh;
+  padding-bottom: var(--console-h);
+  font-family: var(--font-display);
+}
+
+/* Film grain */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-led);
+  outline-offset: 2px;
+}
+
+/* Sections receive programmatic focus after a cue jump; the jump itself is the feedback. */
+[data-cue]:focus {
+  outline: none;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+.skip-link {
+  position: absolute;
+  top: -48px;
+  left: 8px;
+  z-index: 200;
+  padding: 8px 12px;
+  background: var(--color-led);
+  color: var(--color-stage);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
