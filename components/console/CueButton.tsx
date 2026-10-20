@@ -15,8 +15,7 @@ export function CueButton({ cue, label }: { cue: number; label: string }) {
       aria-current={active ? 'true' : undefined}
       onClick={() => {
         playClick()
-        consoleStore.setValue('activeCue', cue)
-        scrollToCue(cue)
+        if (scrollToCue(cue)) consoleStore.setValue('activeCue', cue)
       }}
     >
       <span className="led" data-on={active} aria-hidden="true" />

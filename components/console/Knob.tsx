@@ -16,6 +16,7 @@ export function Knob({ id, label, detents, format }: Props) {
   const value = useConsole((s) => s[id])
   const dialRef = useRef<HTMLDivElement>(null)
   const drag = useRef<{ y: number; v: number } | null>(null)
+  const wheelAcc = useRef(0)
 
   // Wheel needs a non-passive listener so it can stop the page from scrolling.
   useEffect(() => {
@@ -23,8 +24,15 @@ export function Knob({ id, label, detents, format }: Props) {
     if (!el) return
     const onWheel = (e: WheelEvent) => {
       e.preventDefault()
+      // Trackpads fire many small deltas: one detent per 50px accumulated.
+      if (Math.sign(e.deltaY) !== Math.sign(wheelAcc.current)) wheelAcc.current = 0
+      wheelAcc.current += e.deltaY
+      const steps = Math.trunc(Math.abs(wheelAcc.current) / 50)
+      if (!steps) return
+      const dir = wheelAcc.current < 0 ? 1 : -1
+      wheelAcc.current %= 50
       const current = consoleStore.get()[id]
-      consoleStore.setValue(id, stepValue(current, min, max, detents, e.deltaY < 0 ? 1 : -1))
+      consoleStore.setValue(id, stepValue(current, min, max, detents, dir, steps))
     }
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => el.removeEventListener('wheel', onWheel)
@@ -59,6 +67,7 @@ export function Knob({ id, label, detents, format }: Props) {
         style={{ '--angle': `${angle}deg` } as CSSProperties}
         onKeyDown={onKeyDown}
         onPointerDown={(e) => {
+          if (e.button !== 0) return
           e.currentTarget.setPointerCapture(e.pointerId)
           drag.current = { y: e.clientY, v: value }
         }}

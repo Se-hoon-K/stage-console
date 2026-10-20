@@ -27,10 +27,15 @@ export function Pad({ kind, label }: { kind: PadKind; label: string }) {
         if (e.detail === 0) fire()
       }}
       onKeyDown={(e) => {
-        if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          // Always block the default so auto-repeat can't synthesize extra clicks.
           e.preventDefault()
-          fire()
+          if (!e.repeat) fire()
         }
+      }}
+      // Space activates the button on keyup.
+      onKeyUp={(e) => {
+        if (e.key === ' ') e.preventDefault()
       }}
     >
       {label}

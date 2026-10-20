@@ -76,6 +76,7 @@ export const consoleStore = {
   },
 }
 
+/** The selector must return a primitive (or otherwise stable value): a new object/array per call re-renders forever. */
 export function useConsole<T>(selector: (s: ConsoleState) => T): T {
   return useSyncExternalStore(
     consoleStore.subscribe,

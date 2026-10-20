@@ -59,4 +59,23 @@ describe('Console', () => {
     expect(scrollToCue).toHaveBeenCalledWith(5)
     expect(consoleStore.get().activeCue).toBe(5)
   })
+
+  it('does not change the active cue when the scroll fails', () => {
+    vi.mocked(scrollToCue).mockReturnValueOnce(false)
+    render(<Console />)
+    act(() => consoleStore.setValue('activeCue', 3))
+    fireEvent.click(screen.getByRole('button', { name: /CUE 05/ }))
+    expect(consoleStore.get().activeCue).toBe(3)
+  })
+
+  it('accumulates small wheel deltas into one detent per 50px', () => {
+    render(<Console />)
+    const tempo = screen.getByRole('slider', { name: 'Tempo' })
+    const wheel = () => act(() => void tempo.dispatchEvent(new WheelEvent('wheel', { deltaY: -10, bubbles: true, cancelable: true })))
+    for (let i = 0; i < 4; i++) wheel()
+    expect(tempo).toHaveAttribute('aria-valuenow', '120')
+    wheel()
+    wheel()
+    expect(tempo).toHaveAttribute('aria-valuenow', '130')
+  })
 })
