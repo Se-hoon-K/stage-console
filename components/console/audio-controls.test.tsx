@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { initAudio, playPad } from '@/console/audio'
+import { onPadHit } from '@/console/padEvents'
 import { consoleStore } from '@/console/store'
 import { Pad } from './Pad'
 import { SoundToggle } from './SoundToggle'
@@ -74,5 +75,14 @@ describe('audio controls', () => {
     render(<Pad kind="hit" label="Hit" />)
     fireEvent.pointerDown(screen.getByRole('button', { name: 'Hit' }), { button: 2 })
     expect(playPad).not.toHaveBeenCalled()
+  })
+
+  it('announces every pad hit to the stage, even with sound off', () => {
+    const hits: string[] = []
+    const off = onPadHit((k) => hits.push(k))
+    render(<Pad kind="hit" label="Hit" />)
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'Hit' }), { button: 0 })
+    off()
+    expect(hits).toEqual(['hit'])
   })
 })

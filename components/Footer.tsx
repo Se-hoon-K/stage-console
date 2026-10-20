@@ -3,7 +3,7 @@ import { agency } from '@/content/agency'
 export function Footer() {
   const { name, credits } = agency
   return (
-    <footer className="label border-t border-line px-5 py-10 md:px-10">
+    <footer className="label relative z-10 border-t border-line bg-stage px-5 py-10 md:px-10">
       <p className="max-w-3xl normal-case tracking-normal">
         <span className="text-ink">{name}</span> is a fictional agency. This site is a portfolio piece designed &amp;
         developed by <span className="text-ink">{credits.author}</span>.

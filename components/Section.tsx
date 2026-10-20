@@ -17,7 +17,7 @@ export function Section({ cue, level = 2, className = '', children }: Props) {
       data-cue={cue}
       tabIndex={-1}
       aria-labelledby={`cue-${cue}-title`}
-      className={`${cue === 1 ? '' : 'border-t border-line'} px-5 py-24 md:px-10 ${className}`}
+      className={`${cue === 1 ? '' : 'border-t border-line bg-stage'} px-5 py-24 md:px-10 ${className}`}
     >
       <p className="label mb-6">
         {cueLabel(cue)} — {label}
