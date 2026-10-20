@@ -98,3 +98,115 @@ body::after {
   -webkit-text-stroke: 1px var(--color-ink);
   transition: font-stretch 200ms var(--ease-mechanical);
 }
+
+/* Work list */
+.work-name {
+  font-stretch: 75%;
+  transition: font-stretch 300ms var(--ease-mechanical), color 150ms var(--ease-mechanical);
+}
+
+.work-row[data-active='true'] .work-name {
+  font-stretch: 125%;
+  color: var(--color-led);
+}
+
+.work-preview {
+  opacity: 0;
+  transition: opacity 150ms var(--ease-mechanical);
+}
+
+.work-preview[data-visible='true'] {
+  opacity: 1;
+}
+
+/* Shared LED (also defined in console.css for the console bundle) */
+.led {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  vertical-align: middle;
+  background: #3a1a14;
+}
+
+.led[data-on='true'] {
+  background: var(--color-led);
+  box-shadow: 0 0 6px var(--color-led);
+}
+
+/* Rack units */
+.rack-screw {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  box-shadow: inset 0 1px 0 #000;
+}
+
+.rack-toggle {
+  flex: none;
+  padding: 8px 10px;
+  border: 1px solid var(--color-line);
+  background: #141414;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: inset 0 -2px 0 #000;
+}
+
+.rack-toggle:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* Contact */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 18s linear infinite;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-visible .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-item {
+  padding-right: 3rem;
+  font-size: clamp(2rem, 7vw, 6rem);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.book-button {
+  display: inline-block;
+  padding: 18px 28px;
+  background: var(--color-led);
+  color: var(--color-stage);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 80ms var(--ease-mechanical), box-shadow 80ms var(--ease-mechanical);
+}
+
+.book-button:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
