@@ -45,7 +45,13 @@ export async function initAudio(): Promise<boolean> {
     engine = { ctx, master, analyser, noise, samples: new Uint8Array(analyser.fftSize) }
 
     // Mute follows the store; a short time constant avoids clicks. Subscribed once, only after success.
-    const applyMute = () => master.gain.setTargetAtTime(consoleStore.get().soundOn ? 0.8 : 0, ctx.currentTime, 0.02)
+    let applied: boolean | undefined
+    const applyMute = () => {
+      const { soundOn } = consoleStore.get()
+      if (soundOn === applied) return
+      applied = soundOn
+      master.gain.setTargetAtTime(soundOn ? 0.8 : 0, ctx.currentTime, 0.02)
+    }
     consoleStore.subscribe(applyMute)
     applyMute()
     return true
