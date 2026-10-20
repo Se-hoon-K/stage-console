@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Archivo, IBM_Plex_Mono } from 'next/font/google'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
+import { SmoothScroll } from '@/components/SmoothScroll'
 import { agency } from '@/content/agency'
 import './globals.css'
 
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${archivo.variable} ${plexMono.variable}`}>
       <body>
+        <SmoothScroll />
         <a href="#main" className="skip-link">Skip to content</a>
         <Header />
         <main id="main">{children}</main>
