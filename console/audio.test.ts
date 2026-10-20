@@ -10,6 +10,18 @@ describe('audio engine before start', () => {
     expect(await initAudio()).toBe(false)
   })
 
+  it('reports unsupported when the AudioContext constructor throws', async () => {
+    vi.stubGlobal(
+      'AudioContext',
+      class {
+        constructor() {
+          throw new Error('too many contexts')
+        }
+      },
+    )
+    expect(await initAudio()).toBe(false)
+  })
+
   it('ignores pads and clicks, and reads silence, before audio starts', () => {
     expect(() => playPad('kick')).not.toThrow()
     expect(() => playClick()).not.toThrow()

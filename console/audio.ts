@@ -14,35 +14,44 @@ let engine: Engine | null = null
 
 /** Creates the audio graph on first call (must come from a user gesture). Returns false without Web Audio. */
 export async function initAudio(): Promise<boolean> {
-  if (engine) {
-    await engine.ctx.resume()
+  try {
+    if (engine) {
+      await engine.ctx.resume()
+      return true
+    }
+    const Ctor =
+      window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    if (!Ctor) return false
+
+    const ctx = new Ctor()
+    const master = ctx.createGain()
+    master.gain.value = 0
+    const analyser = ctx.createAnalyser()
+    analyser.fftSize = 256
+    master.connect(analyser)
+    analyser.connect(ctx.destination)
+
+    const noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate)
+    const data = noise.getChannelData(0)
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1
+
+    try {
+      await ctx.resume()
+    } catch (err) {
+      void ctx.close().catch(() => {})
+      throw err
+    }
+
+    engine = { ctx, master, analyser, noise, samples: new Uint8Array(analyser.fftSize) }
+
+    // Mute follows the store; a short time constant avoids clicks. Subscribed once, only after success.
+    const applyMute = () => master.gain.setTargetAtTime(consoleStore.get().soundOn ? 0.8 : 0, ctx.currentTime, 0.02)
+    consoleStore.subscribe(applyMute)
+    applyMute()
     return true
+  } catch {
+    return false
   }
-  const Ctor =
-    window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-  if (!Ctor) return false
-
-  const ctx = new Ctor()
-  const master = ctx.createGain()
-  master.gain.value = 0
-  const analyser = ctx.createAnalyser()
-  analyser.fftSize = 256
-  master.connect(analyser)
-  analyser.connect(ctx.destination)
-
-  const noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate)
-  const data = noise.getChannelData(0)
-  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1
-
-  engine = { ctx, master, analyser, noise, samples: new Uint8Array(analyser.fftSize) }
-
-  // Mute follows the store; a short time constant avoids clicks.
-  const applyMute = () => master.gain.setTargetAtTime(consoleStore.get().soundOn ? 0.8 : 0, ctx.currentTime, 0.02)
-  consoleStore.subscribe(applyMute)
-  applyMute()
-
-  await ctx.resume()
-  return true
 }
 
 function envelope(ctx: AudioContext, peak: number, attack: number, decay: number, t: number) {

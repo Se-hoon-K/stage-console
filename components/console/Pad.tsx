@@ -19,7 +19,13 @@ export function Pad({ kind, label }: { kind: PadKind; label: string }) {
       type="button"
       className="pad"
       data-lit={lit}
-      onPointerDown={fire}
+      onPointerDown={(e) => {
+        if (e.button === 0) fire()
+      }}
+      // detail 0 = click without pointer/key (VoiceOver, switch, voice control)
+      onClick={(e) => {
+        if (e.detail === 0) fire()
+      }}
       onKeyDown={(e) => {
         if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) {
           e.preventDefault()
