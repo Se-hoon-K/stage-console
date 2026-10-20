@@ -336,7 +336,7 @@ console/
 content/
   agency.ts  events.ts
 public/images/events/
-docs/superpowers/specs/2026-10-20-portfolio-design.md
+docs/superpowers/specs/portfolio-design.md
 README.md
 ```
 
@@ -367,7 +367,7 @@ Console (DOM) ─► store ─► StageScene (useFrame) + audio + Meter
 ## 13. Risks & mitigations
 | Risk | Mitigation |
 |---|---|
-| Procedural stage looks cheap | Week 2 checkpoint; fall back to Blender GLB for hero only (data shape already supports it) |
+| Procedural stage looks cheap | Stage 2 checkpoint; fall back to Blender GLB for hero only (data shape already supports it) |
 | Console confuses recruiters | Normal menu always present; console starts collapsed-but-visible with a one-line hint |
 | 3 weeks too tight | Cut order: 404 polish → gallery shader → fog → bloom → second camera move |
 | Mobile perf | Fewer parts, no bloom, SVG fallback threshold |
@@ -377,21 +377,21 @@ Console (DOM) ─► store ─► StageScene (useFrame) + audio + Meter
 
 ## 14. Milestones (each ends deployable on Vercel)
 
-**Week 1: Foundation + console**
+**Stage 1: Foundation + console**
 1. `git init`, Next.js + Tailwind v4 + pnpm scaffold, tokens, fonts, README skeleton, Vercel deploy
 2. SmoothScroll (Lenis + GSAP), header/footer with credits, section skeletons with cue anchors
 3. Console store + Fader/Knob/CueButton/Pad/SoundToggle components (keyboard + pointer)
 4. Audio engine + Meter
 ✅ Checkpoint: console fully playable on a blank page, keyboard-only works
 
-**Week 2: Stage + home**
+**Stage 2: Stage + home**
 5. PRNG + `generateStage` + test, `toSvg` fallback rendered in hero
 6. Persistent Canvas, StageScene with instancing, materials, light cones
 7. Scroll-driven assembly + lights-on, console → lights/fog/tempo/pads wired
 8. Manifesto, Work list (with hover previews), Services, Contact sections
 ✅ Checkpoint: PM review of the signature moment (stage + console) — go/no-go on procedural vs Blender
 
-**Week 3: Detail + polish**
+**Stage 3: Detail + polish**
 9. Event detail page (title, stage, run sheet, stats, gallery, next)
 10. Page transitions, preloader, 404
 11. Mobile console sheet, responsive pass
@@ -412,7 +412,7 @@ Console (DOM) ─► store ─► StageScene (useFrame) + audio + Meter
 - CI: `.github/workflows/ci.yml` on PR + push to main: `pnpm install --frozen-lockfile` → `pnpm lint` → `pnpm typecheck` → `pnpm test` → `pnpm build`.
 - Deploy: Vercel GitHub integration → preview URL per PR, production on `main`. (PM connects Vercel to the repo once; requires their Vercel login.)
 - Branch protection on `main`: require CI pass + PR (set via `gh api` after first CI run).
-- Tracking: GitHub Issues per milestone task, grouped in Milestones `Week 1/2/3`; PRs close issues (`Closes #12`).
+- Tracking: GitHub Issues per milestone task, grouped in Milestones `Stage 1/2/3`; PRs close issues (`Closes #12`).
 - Releases: tag `v0.1.0` at MVP launch with release notes.
 - `.gitignore` (Next.js defaults + `.env*`, `.vercel`), MIT license, README badges (CI, deploy).
 
@@ -433,7 +433,7 @@ Console (DOM) ─► store ─► StageScene (useFrame) + audio + Meter
 ---
 
 ## First steps after approval
-1. Bootstrap per §16: `git init`, save this spec to `docs/superpowers/specs/2026-10-20-portfolio-design.md`, commit, create public repo, push
+1. Bootstrap per §16: `git init`, save this spec to `docs/superpowers/specs/portfolio-design.md`, commit, create public repo, push
 2. PM reviews the spec file on GitHub → invoke `superpowers:writing-plans` for the task-level implementation plan (committed via PR)
 
 ## Verification
