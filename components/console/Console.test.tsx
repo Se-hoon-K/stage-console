@@ -4,7 +4,7 @@ import { consoleStore } from '@/console/store'
 import { scrollToCue } from '@/lib/scroll'
 import { Console } from './Console'
 
-vi.mock('@/lib/scroll', () => ({ scrollToCue: vi.fn(() => true) }))
+vi.mock('@/lib/scroll', () => ({ scrollToCue: vi.fn(() => true), isGliding: () => false }))
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }))
 vi.mock('@/console/audio', () => ({ initAudio: vi.fn(), playPad: vi.fn(), playClick: vi.fn(), readLevel: () => 0 }))
 

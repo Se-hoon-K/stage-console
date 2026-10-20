@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
+import { isGliding } from '@/lib/scroll'
 import { consoleStore } from './store'
 
 /** Lights the cue whose section crosses the middle of the viewport. */
@@ -16,7 +17,7 @@ export function useCueTracking() {
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) consoleStore.setValue('activeCue', Number(entry.target.getAttribute('data-cue')))
+          if (entry.isIntersecting && !isGliding()) consoleStore.setValue('activeCue', Number(entry.target.getAttribute('data-cue')))
         }
       },
       { rootMargin: '-50% 0px -50% 0px' },
