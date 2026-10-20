@@ -1,4 +1,5 @@
 import { HeroStage } from '@/components/sections/HeroStage'
+import { Manifesto } from '@/components/sections/Manifesto'
 import { Section } from '@/components/Section'
 import { agency } from '@/content/agency'
 
@@ -10,11 +11,7 @@ export default function Home() {
       </Section>
 
       <Section cue={2}>
-        <div className="mt-12 max-w-4xl space-y-2 text-[clamp(1.5rem,3vw,2.75rem)] font-semibold leading-tight">
-          {agency.manifesto.map((line) => (
-            <p key={line}>{line}</p>
-          ))}
-        </div>
+        <Manifesto lines={agency.manifesto} />
       </Section>
 
       <Section cue={3} />
