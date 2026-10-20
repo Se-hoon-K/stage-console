@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SoundToggle } from '@/components/console/SoundToggle'
 import { agency } from '@/content/agency'
 import { CUES } from '@/content/cues'
 
@@ -19,6 +20,7 @@ export function Header() {
           ))}
         </ul>
       </nav>
+      <SoundToggle />
     </header>
   )
 }

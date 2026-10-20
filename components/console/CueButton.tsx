@@ -1,5 +1,6 @@
 'use client'
 
+import { playClick } from '@/console/audio'
 import { cueLabel } from '@/content/cues'
 import { consoleStore, useConsole } from '@/console/store'
 import { scrollToCue } from '@/lib/scroll'
@@ -13,6 +14,7 @@ export function CueButton({ cue, label }: { cue: number; label: string }) {
       className="cue-button"
       aria-current={active ? 'true' : undefined}
       onClick={() => {
+        playClick()
         consoleStore.setValue('activeCue', cue)
         scrollToCue(cue)
       }}
