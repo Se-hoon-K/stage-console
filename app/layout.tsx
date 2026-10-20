@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Archivo, IBM_Plex_Mono } from 'next/font/google'
+import { Console } from '@/components/console/Console'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { SmoothScroll } from '@/components/SmoothScroll'
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SmoothScroll />
         <a href="#main" className="skip-link">Skip to content</a>
         <Header />
+        <Console />
         <main id="main">{children}</main>
         <Footer />
       </body>
