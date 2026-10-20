@@ -8,6 +8,7 @@ describe('scrollToCue', () => {
     vi.mocked(Element.prototype.scrollIntoView).mockClear()
   })
   afterEach(() => {
+    vi.useRealTimers()
     setLenis(null)
     window.dispatchEvent(new Event('scrollend'))
   })
@@ -44,6 +45,14 @@ describe('scrollToCue', () => {
     scrollToCue(3)
     expect(isGliding()).toBe(true)
     done!()
+    expect(isGliding()).toBe(false)
+  })
+
+  it('ends an in-flight Lenis glide when Lenis is replaced', () => {
+    setLenis({ scrollTo: vi.fn() } as unknown as Lenis)
+    scrollToCue(3)
+    expect(isGliding()).toBe(true)
+    setLenis(null)
     expect(isGliding()).toBe(false)
   })
 

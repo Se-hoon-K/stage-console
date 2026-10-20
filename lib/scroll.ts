@@ -6,6 +6,7 @@ let safety: number | undefined
 
 export function setLenis(instance: Lenis | null) {
   lenis = instance
+  endGlide()
 }
 
 /** True while a cue-triggered scroll is still travelling. */
@@ -18,6 +19,7 @@ function endGlide() {
 }
 
 function startGlide() {
+  window.removeEventListener('scrollend', endGlide)
   gliding = true
   window.clearTimeout(safety)
   safety = window.setTimeout(endGlide, 1600)
