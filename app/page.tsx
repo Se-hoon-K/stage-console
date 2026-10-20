@@ -1,10 +1,13 @@
+import { HeroStage } from '@/components/sections/HeroStage'
 import { Section } from '@/components/Section'
 import { agency } from '@/content/agency'
 
 export default function Home() {
   return (
     <>
-      <Section cue={1} level={1} className="flex min-h-[calc(100svh-var(--console-h))] flex-col justify-end" />
+      <Section cue={1} level={1} className="relative isolate flex min-h-[calc(100svh-var(--console-h))] flex-col justify-end">
+        <HeroStage />
+      </Section>
 
       <Section cue={2}>
         <div className="mt-12 max-w-4xl space-y-2 text-[clamp(1.5rem,3vw,2.75rem)] font-semibold leading-tight">
