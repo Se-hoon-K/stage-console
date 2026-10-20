@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { type PadKind, playPad } from '@/console/audio'
+import { emitPadHit } from '@/console/padEvents'
 
 export function Pad({ kind, label }: { kind: PadKind; label: string }) {
   const [lit, setLit] = useState(false)
@@ -9,6 +10,7 @@ export function Pad({ kind, label }: { kind: PadKind; label: string }) {
 
   const fire = () => {
     playPad(kind)
+    emitPadHit(kind)
     setLit(true)
     window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setLit(false), 140)
