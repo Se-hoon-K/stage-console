@@ -307,3 +307,35 @@ body::after {
 html[data-preloaded] .preloader {
   display: none;
 }
+
+.header-nav-list {
+  display: flex;
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .header-nav {
+    position: relative;
+  }
+
+  .header-nav-list {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 12px);
+    flex-direction: column;
+    gap: 0;
+    min-width: 180px;
+    border: 1px solid var(--color-line);
+    background: var(--color-panel);
+  }
+
+  .header-nav-list[data-open='true'] {
+    display: flex;
+  }
+
+  .header-nav-list a {
+    display: block;
+    padding: 12px 16px;
+  }
+}

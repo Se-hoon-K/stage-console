@@ -1,7 +1,7 @@
+import { HeaderNav } from '@/components/HeaderNav'
 import { TransitionLink } from '@/components/TransitionLink'
 import { SoundToggle } from '@/components/console/SoundToggle'
 import { agency } from '@/content/agency'
-import { CUES } from '@/content/cues'
 
 export function Header() {
   return (
@@ -9,17 +9,7 @@ export function Header() {
       <TransitionLink href="/" className="font-display text-lg font-black uppercase tracking-tight">
         {agency.name}
       </TransitionLink>
-      <nav aria-label="Main" className="overflow-x-auto">
-        <ul className="label flex gap-4">
-          {CUES.map((c) => (
-            <li key={c.n}>
-              <TransitionLink href={`/#cue-${c.n}`} className="hover:text-ink">
-                {c.label}
-              </TransitionLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <HeaderNav />
       <SoundToggle />
     </header>
   )
