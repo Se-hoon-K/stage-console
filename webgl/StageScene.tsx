@@ -179,12 +179,12 @@ export function StageScene() {
     const fitZ = fitDistance(stage.bounds[0], (state.camera as THREE.PerspectiveCamera).fov, state.size.width / state.size.height)
     const startZ = Math.max(30, fitZ * 1.4)
     const endZ = Math.max(19, fitZ)
-    // Show: arc ~25° around the stage and push in 20%.
-    const angle = (reduced ? 0 : show) * THREE.MathUtils.degToRad(25)
-    const dist = (startZ + (endZ - startZ) * p) * (1 - 0.2 * (reduced ? 0 : show))
+    // Show: arc ~18° around the stage and push in 8%.
+    const angle = (reduced ? 0 : show) * THREE.MathUtils.degToRad(18)
+    const dist = (startZ + (endZ - startZ) * p) * (1 - 0.08 * (reduced ? 0 : show))
     camTarget.set(
       Math.sin(angle) * dist + (live ? state.pointer.x * 0.8 : 0),
-      7 - 2.5 * p - 1 * show + (live ? state.pointer.y * 0.4 : 0),
+      7 - 2.5 * p - 0.5 * show + (live ? state.pointer.y * 0.4 : 0),
       Math.cos(angle) * dist,
     )
     state.camera.position.lerp(camTarget, reduced ? 1 : 0.08)

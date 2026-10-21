@@ -226,12 +226,12 @@ body::after {
   }
 }
 
-/* Hero title rises and dims in the first quarter of the pin (decision a), leaving the stage clear for
+/* Hero title rises and fades out in the first quarter of the pin (decision a), leaving the stage clear for
    the lights and the show. --assembly is 0–1, set by useStageSection. */
 #cue-1 h1 {
   --title-out: min(1, calc(var(--assembly, 0) * 4));
-  transform: translateY(calc(var(--title-out) * -22vh));
-  opacity: calc(1 - var(--title-out) * 0.85);
+  transform: translateY(calc(var(--title-out) * -30vh));
+  opacity: calc(1 - var(--title-out));
   will-change: transform, opacity;
 }
 
