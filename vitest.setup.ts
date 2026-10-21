@@ -19,3 +19,11 @@ Object.defineProperty(window, 'matchMedia', {
 })
 
 Element.prototype.scrollIntoView = vi.fn()
+
+vi.mock('next/link', async () => {
+  const { createElement } = await import('react')
+  return {
+    default: ({ href, children, ...rest }: { href: string; children?: unknown } & Record<string, unknown>) =>
+      createElement('a', { href, ...rest }, children as never),
+  }
+})

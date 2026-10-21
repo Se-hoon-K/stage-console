@@ -12,6 +12,8 @@ export function setLenis(instance: Lenis | null) {
 /** True while a cue-triggered scroll is still travelling. */
 export const isGliding = () => gliding
 
+export const getLenis = () => lenis
+
 function endGlide() {
   gliding = false
   window.clearTimeout(safety)

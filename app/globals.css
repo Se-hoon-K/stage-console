@@ -217,3 +217,12 @@ body::after {
   opacity: calc(1 - var(--assembly, 0) * 0.85);
   will-change: transform, opacity;
 }
+
+.shutter {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--color-panel);
+  transform: scaleY(0);
+  pointer-events: none;
+}
