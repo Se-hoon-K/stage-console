@@ -214,7 +214,7 @@ export function StageScene() {
       Math.cos(angle) * dist,
     )
     state.camera.position.lerp(camTarget, reduced ? 1 : 0.08)
-    state.camera.lookAt(0, 3, 0)
+    state.camera.lookAt(0, 3 + 1.2 * (reduced ? 1 : showProgress(progress)), 0) // tilt up during the show so the rig and its lenses stay in frame
 
     if (bloomRef.current) bloomRef.current.intensity = 0.5 + flash.value * 1.4
   })
