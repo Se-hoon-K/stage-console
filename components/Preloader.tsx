@@ -3,8 +3,6 @@
 import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import { gsap } from '@/lib/gsap'
 import { PRELOADED_KEY } from '@/lib/preloaderKey'
-import { stageView } from '@/stage/view'
-import { canUseWebGL } from '@/webgl/support'
 
 const CHANNELS = 8
 
@@ -28,7 +26,7 @@ function markSeen() {
   } catch {}
 }
 
-/** First visit per session: a sound-check counter while fonts and the stage get ready. */
+/** First visit per session: a sound-check counter while the fonts load. */
 export function Preloader() {
   const [done, setDone] = useState(false)
   const root = useRef<HTMLDivElement>(null)
@@ -40,7 +38,6 @@ export function Preloader() {
       return () => window.clearTimeout(t)
     }
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const webgl = canUseWebGL()
     let fontsReady = !document.fonts
     void document.fonts?.ready.then(() => (fontsReady = true))
     const start = performance.now()
@@ -65,11 +62,11 @@ export function Preloader() {
     }
 
     if (reduced) {
-      // No counting: show the full state and fade out as soon as the stage is ready (or at the 3 s cap).
+      // No counting: show the full state and fade out as soon as the fonts are ready (or at the 3 s cap).
       if (counter.current) counter.current.textContent = '100'
       root.current?.style.setProperty('--lit', String(CHANNELS))
       const poll = window.setInterval(() => {
-        if (fontsReady && (!webgl || stageView.get().webglReady)) {
+        if (fontsReady) {
           window.clearInterval(poll)
           finish()
         }
@@ -86,8 +83,8 @@ export function Preloader() {
     }
 
     const tick = (now: number) => {
-      const ready = fontsReady && (!webgl || stageView.get().webglReady)
-      const pct = preloadPercent(now - start, ready)
+      // Fonts only: the WebGL stage mounts after load/idle (webgl/Scene) behind its SVG fallback.
+      const pct = preloadPercent(now - start, fontsReady)
       if (counter.current) counter.current.textContent = String(pct).padStart(3, '0')
       root.current?.style.setProperty('--lit', String(Math.floor((pct / 100) * CHANNELS)))
       if (pct >= 100 && !finished) return finish()
