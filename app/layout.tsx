@@ -4,6 +4,7 @@ import { Console } from '@/components/console/Console'
 import { ConsoleCssVars } from '@/components/ConsoleCssVars'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
+import { Preloader } from '@/components/Preloader'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { agency } from '@/content/agency'
 import { Scene } from '@/webgl/Scene'
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Scene />
         <main id="main" className="relative z-10">{children}</main>
         <Footer />
+        <Preloader />
         <div id="shutter" aria-hidden="true" className="shutter" />
       </body>
     </html>

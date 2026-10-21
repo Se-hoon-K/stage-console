@@ -272,3 +272,34 @@ body::after {
   outline: 2px solid var(--color-led);
   outline-offset: -2px;
 }
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 20px;
+  background: var(--color-stage);
+}
+
+.preloader-leds {
+  display: flex;
+  gap: 10px;
+}
+
+.preloader-leds span {
+  width: 10px;
+  height: 10px;
+  background: var(--color-led);
+  /* channel i lights once --lit passes it */
+  opacity: clamp(0.15, calc(var(--lit, 0) - var(--i)), 1);
+}
+
+.preloader-count {
+  font-size: clamp(6rem, 30vw, 22rem);
+  font-weight: 900;
+  line-height: 0.8;
+  font-variant-numeric: tabular-nums;
+}
