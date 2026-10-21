@@ -119,21 +119,6 @@ body::after {
   opacity: 1;
 }
 
-/* Shared LED (also defined in console.css for the console bundle) */
-.led {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-right: 6px;
-  vertical-align: middle;
-  background: #3a1a14;
-}
-
-.led[data-on='true'] {
-  background: var(--color-led);
-  box-shadow: 0 0 6px var(--color-led);
-}
-
 /* Rack units */
 .rack-screw {
   position: absolute;
