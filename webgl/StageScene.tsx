@@ -19,6 +19,7 @@ type BodyKind = 'deck' | 'truss' | 'speaker' | 'screen'
 const BODY_KINDS: BodyKind[] = ['deck', 'truss', 'speaker', 'screen']
 const BODY_COLORS: Record<BodyKind, string> = { deck: '#262626', truss: '#1c1c1c', speaker: '#111111', screen: '#0a0a0a' }
 const BEAM_MIN_HEIGHT = 3
+const NO_AIM = { pan: 0, tilt: 0 }
 
 // Scratch objects reused every frame (no per-frame allocation).
 const obj = new THREE.Object3D()
@@ -106,7 +107,7 @@ function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
     // Read material/geometry back off the mesh so the compiler sees no mutation of memoised values.
     const mat = beams.material as THREE.ShaderMaterial
     mat.uniforms.uColor.value.copy(hueCol)
-    mat.uniforms.uTime.value = time
+    mat.uniforms.uTime.value = reduced ? 0 : time % 256 // still haze under reduced motion; bounded for mobile float precision
     mat.uniforms.uHaze.value = c.fog
     const levels = beams.geometry.getAttribute('aLevel') as THREE.InstancedBufferAttribute
 
@@ -125,7 +126,7 @@ function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
       const hung = p.position[1] > BEAM_MIN_HEIGHT
 
       const h = hung ? obj.position.y : 0
-      const aim = hung ? beamAim({ show, index: i, count: lights.length, time, reduced }) : { pan: 0, tilt: 0 }
+      const aim = hung ? beamAim({ show, index: i, count: lights.length, time, reduced }) : NO_AIM
       // Beams hang along -y; negative x rotation leans them toward the audience (+z). Ground washes face the audience.
       obj.rotation.set(hung ? -aim.tilt : -Math.PI / 2, 0, aim.pan)
       obj.scale.setScalar(1)
@@ -147,10 +148,10 @@ function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
     }
 
     levels.needsUpdate = true
-    for (const mesh of [lens, flares]) {
-      mesh.instanceMatrix.needsUpdate = true
-      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
-    }
+    lens.instanceMatrix.needsUpdate = true
+    if (lens.instanceColor) lens.instanceColor.needsUpdate = true
+    flares.instanceMatrix.needsUpdate = true
+    if (flares.instanceColor) flares.instanceColor.needsUpdate = true
     beams.instanceMatrix.needsUpdate = true
     if (washRef.current) {
       washRef.current.color.copy(hueCol)
