@@ -226,3 +226,34 @@ body::after {
   transform: scaleY(0);
   pointer-events: none;
 }
+
+.stat-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25em;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.stat-unit {
+  font-family: var(--font-mono);
+  font-size: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+.run-row[aria-current='step'] .run-cue {
+  color: var(--color-led);
+}
+
+.next-show {
+  font-stretch: 75%;
+  transition: font-stretch 300ms var(--ease-mechanical), color 150ms var(--ease-mechanical);
+}
+
+.next-show:hover,
+.next-show:focus-visible {
+  font-stretch: 125%;
+  color: var(--color-led);
+}
