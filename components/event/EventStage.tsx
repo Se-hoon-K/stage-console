@@ -18,6 +18,7 @@ export function EventStage({ seed, name }: { seed: number; name: string }) {
   const percent = useStageView((s) => Math.round(s.progress * 100))
 
   return (
+    <div data-pin-spacer>
     <section ref={ref} aria-label={`${name} stage`} className="relative isolate h-[calc(100svh-var(--console-h))]">
       <StageSvg
         stage={stage}
@@ -32,5 +33,6 @@ export function EventStage({ seed, name }: { seed: number; name: string }) {
         </p>
       </div>
     </section>
+    </div>
   )
 }

@@ -70,4 +70,13 @@ describe('useStageSection', () => {
     expect(ctxRevert).toHaveBeenCalled()
     expect(screen.getByText('next')).toBeInTheDocument()
   })
+
+  it('passes a React-owned data-pin-spacer parent as pinSpacer, else undefined', () => {
+    const pinSpacer = () => (vi.mocked(ScrollTrigger.create).mock.calls.at(-1)![0] as unknown as { pinSpacer?: Element }).pinSpacer
+    const { container, unmount } = render(<div data-pin-spacer><Probe seed={7} /></div>)
+    expect(pinSpacer()).toBe(container.firstElementChild)
+    unmount()
+    render(<Probe seed={7} />)
+    expect(pinSpacer()).toBeUndefined()
+  })
 })

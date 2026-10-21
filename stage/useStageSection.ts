@@ -32,12 +32,15 @@ export function useStageSection(ref: RefObject<HTMLElement | null>, { seed, end 
       stageView.set({ progress })
       section.style.setProperty('--assembly', String(progress))
     }
+    // React-owned spacer: ScrollTrigger must not re-parent a node React tracks.
+    const spacer = section.parentElement?.hasAttribute('data-pin-spacer') ? section.parentElement : undefined
     const ctx = gsap.context(() => {
       const trigger = ScrollTrigger.create({
         trigger: section,
         start: 'top top',
         end,
         pin: true,
+        pinSpacer: spacer,
         scrub: true,
         onUpdate: (self) => apply(self.progress),
       })
