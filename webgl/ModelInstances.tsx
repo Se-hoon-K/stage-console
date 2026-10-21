@@ -22,21 +22,23 @@ export function ModelInstances({
 }) {
   const refs = useRef<(THREE.InstancedMesh | null)[]>([])
   useFrame(() => {
-    model.meshes.forEach((mesh, k) => {
+    for (let k = 0; k < model.meshes.length; k++) {
       const im = refs.current[k]
-      if (!im) return
+      if (!im) continue
       for (let i = 0; i < count; i++) {
-        place(i, mesh, matrix)
+        place(i, model.meshes[k], matrix)
         im.setMatrixAt(i, matrix)
       }
       im.instanceMatrix.needsUpdate = true
-    })
+    }
   })
   return model.meshes.map((mesh, k) => (
     <instancedMesh
       key={k}
       ref={(el) => {
         refs.current[k] = el
+        // dispose={null} keeps R3F off the shared geometry/material; the mesh's own instance buffers still need freeing.
+        return () => el?.dispose()
       }}
       args={[mesh.geometry, mesh.material, count]}
       dispose={null}

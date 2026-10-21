@@ -89,7 +89,7 @@ function placeTile({ p, t }: { p: Part; t: Tile }, model: FixtureModel, out: THR
   obj.position.x += t.start[0]
   obj.position.y += t.start[1]
   obj.position.z += t.start[2]
-  const cross = Math.min(...p.size.filter((_, k) => k !== t.axis))
+  const cross = Math.min(p.size[(t.axis + 1) % 3], p.size[(t.axis + 2) % 3])
   out.compose(obj.position, TILE_TURN[t.axis], scaleV.set(cross / model.size.x, t.length, cross / model.size.z))
 }
 
