@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { PadKind } from '@/console/audio'
 import { CUES, cueLabel } from '@/content/cues'
 import { useConsole } from '@/console/store'
@@ -27,11 +27,17 @@ const PADS: { kind: PadKind; label: string }[] = [
 export function Console() {
   useCueTracking()
   const [open, setOpen] = useState(false)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const close = () => {
+    if (panelRef.current?.contains(document.activeElement)) toggleRef.current?.focus()
+    setOpen(false)
+  }
   const activeCue = useConsole((s) => s.activeCue)
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') close()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
@@ -42,15 +48,16 @@ export function Console() {
       <a href="#main" className="skip-link">Skip console</a>
       <section aria-label="Show console" className="console" data-lenis-prevent data-open={open}>
         <div className="console-bar">
+          <SoundToggle />
           <span className="console-bar-cue">
             {cueLabel(activeCue)} — {CUES[activeCue - 1]?.label}
           </span>
-          <button type="button" className="cue-button" aria-expanded={open} aria-controls="console-panel" onClick={() => setOpen((o) => !o)}>
+          <button ref={toggleRef} type="button" className="cue-button" aria-expanded={open} aria-controls="console-panel" onClick={() => (open ? close() : setOpen(true))}>
             <span className="led" data-on={open} aria-hidden="true" />
             Console
           </button>
         </div>
-        <div id="console-panel" className="console-panel">
+        <div ref={panelRef} id="console-panel" className="console-panel">
           <div className="console-group">
             <SoundToggle />
           </div>

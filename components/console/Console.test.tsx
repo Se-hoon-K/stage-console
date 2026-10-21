@@ -95,4 +95,13 @@ describe('Console', () => {
     render(<Console />)
     expect(screen.getByText('CUE 01 — Show')).toBeInTheDocument()
   })
+
+  it('returns focus to the toggle when Escape closes the panel', () => {
+    render(<Console />)
+    const toggle = screen.getByRole('button', { name: 'Console' })
+    fireEvent.click(toggle)
+    screen.getByRole('slider', { name: 'Master' }).focus()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(toggle).toHaveFocus()
+  })
 })

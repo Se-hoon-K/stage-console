@@ -1,14 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TransitionLink } from '@/components/TransitionLink'
 import { CUES } from '@/content/cues'
 
 export function HeaderNav() {
   const [open, setOpen] = useState(false)
+  const btn = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      setOpen(false)
+      btn.current?.focus()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open])
   return (
     <nav aria-label="Main" className="header-nav">
-      <button type="button" className="header-menu label md:hidden" aria-expanded={open} aria-controls="main-nav-list" onClick={() => setOpen((o) => !o)}>
+      <button ref={btn} type="button" className="header-menu label md:hidden" aria-expanded={open} aria-controls="main-nav-list" onClick={() => setOpen((o) => !o)}>
         Menu
       </button>
       <ul id="main-nav-list" data-open={open} className="label header-nav-list">
