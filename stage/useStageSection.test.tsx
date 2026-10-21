@@ -1,7 +1,9 @@
+import { readFileSync } from 'node:fs'
 import { render, screen } from '@testing-library/react'
 import { useRef } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
+import { PIN_LENGTH } from './assembly'
 import { stageView } from './view'
 import { useStageSection } from './useStageSection'
 
@@ -79,4 +81,16 @@ describe('useStageSection', () => {
     render(<Probe seed={7} />)
     expect(pinSpacer()).toBeUndefined()
   })
+})
+
+it('pins with explicit padding spacing and the shared default length', () => {
+  render(<Probe seed={7} />)
+  const config = vi.mocked(ScrollTrigger.create).mock.calls.at(-1)![0] as unknown as { pinSpacing: string; end: string }
+  expect(config.pinSpacing).toBe('padding')
+  expect(config.end).toBe(`+=${PIN_LENGTH}%`)
+})
+
+it('reserves exactly the default pin length in CSS (no jump at hydration)', () => {
+  const css = readFileSync('app/globals.css', 'utf8')
+  expect(css).toMatch(new RegExp(`\\[data-pin-spacer\\]\\s*{\\s*padding-bottom:\\s*${PIN_LENGTH}svh`))
 })

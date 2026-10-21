@@ -2,12 +2,13 @@
 
 import { type RefObject, useLayoutEffect } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
+import { PIN_LENGTH } from './assembly'
 import { stageView } from './view'
 
 type Options = { seed: number; end?: string }
 
 /** Binds a section to the persistent stage canvas: seed, visibility and scroll-driven assembly. */
-export function useStageSection(ref: RefObject<HTMLElement | null>, { seed, end = '+=150%' }: Options) {
+export function useStageSection(ref: RefObject<HTMLElement | null>, { seed, end = `+=${PIN_LENGTH}%` }: Options) {
   useLayoutEffect(() => {
     const node = ref.current
     const section = node?.closest('section') ?? node

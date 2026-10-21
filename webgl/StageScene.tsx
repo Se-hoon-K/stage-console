@@ -7,9 +7,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { onPadHit } from '@/console/padEvents'
 import { consoleStore } from '@/console/store'
-import { lightsOn, partOffset } from '@/stage/assembly'
+import { ASSEMBLY_END, lightsOn, partOffset, showProgress } from '@/stage/assembly'
 import { generateStage, type Part } from '@/stage/generateStage'
-import { lightLevel } from '@/stage/lighting'
+import { beamAim, lightLevel } from '@/stage/lighting'
 import { fitDistance } from '@/stage/camera'
 import { stageView, useStageView } from '@/stage/view'
 import { createBeamMaterial } from './beamMaterial'
@@ -91,6 +91,7 @@ function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
     const { progress } = stageView.get()
     const c = consoleStore.get()
     const time = state.clock.elapsedTime
+    const show = showProgress(progress)
     hueCol.setHSL(c.hue / 360, 1, 0.55)
     // Read material/geometry back off the mesh so the compiler sees no mutation of memoised values.
     const mat = beams.material as THREE.ShaderMaterial
@@ -117,7 +118,8 @@ function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
 
       const hung = p.position[1] > BEAM_MIN_HEIGHT
       const h = hung ? obj.position.y : 0
-      obj.rotation.set(0, 0, hung && !reduced ? Math.sin(time * 0.6 + i) * 0.25 : 0)
+      const aim = hung ? beamAim({ show, index: i, count: lights.length, time, reduced }) : { pan: 0, tilt: 0 }
+      obj.rotation.set(aim.tilt, 0, aim.pan) // tilt about x leans the beam toward the audience (+z)
       obj.scale.set(h, h, h)
       obj.updateMatrix()
       beams.setMatrixAt(i, obj.matrix)
@@ -169,14 +171,22 @@ export function StageScene() {
     flash.value = Math.max(0, flash.value - dt * 4)
     const c = consoleStore.get()
     const { progress } = stageView.get()
-    if (fogRef.current) fogRef.current.density = 0.006 + c.fog * 0.035
+    const show = showProgress(progress)
+    if (fogRef.current) fogRef.current.density = 0.006 + c.fog * 0.035 + show * 0.01
 
-    const p = Math.min(progress / 0.8, 1)
-    const live = progress >= 1 && !reduced
+    const p = Math.min(progress / ASSEMBLY_END, 1)
+    const live = progress >= ASSEMBLY_END && !reduced
     const fitZ = fitDistance(stage.bounds[0], (state.camera as THREE.PerspectiveCamera).fov, state.size.width / state.size.height)
     const startZ = Math.max(30, fitZ * 1.4)
     const endZ = Math.max(19, fitZ)
-    camTarget.set(live ? state.pointer.x * 0.8 : 0, 7 - 2.5 * p + (live ? state.pointer.y * 0.4 : 0), startZ + (endZ - startZ) * p)
+    // Show: arc ~25° around the stage and push in 20%.
+    const angle = (reduced ? 0 : show) * THREE.MathUtils.degToRad(25)
+    const dist = (startZ + (endZ - startZ) * p) * (1 - 0.2 * (reduced ? 0 : show))
+    camTarget.set(
+      Math.sin(angle) * dist + (live ? state.pointer.x * 0.8 : 0),
+      7 - 2.5 * p - 1 * show + (live ? state.pointer.y * 0.4 : 0),
+      Math.cos(angle) * dist,
+    )
     state.camera.position.lerp(camTarget, reduced ? 1 : 0.08)
     state.camera.lookAt(0, 3, 0)
 

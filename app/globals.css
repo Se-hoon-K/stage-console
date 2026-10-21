@@ -38,11 +38,12 @@
   width: 100%;
 }
 
-/* Reserve the pin's scroll length (useStageSection end: '+=150%') before ScrollTrigger adds it at
-   hydration, so the content below does not jump. Only where the pin will exist: JS on, motion allowed. */
+/* Reserve the pin's scroll length (PIN_LENGTH in stage/assembly.ts, used as useStageSection's end)
+   before ScrollTrigger adds it at hydration, so the content below does not jump. Only where the pin
+   will exist: JS on, motion allowed. */
 @media (prefers-reduced-motion: no-preference) {
   [data-js] [data-pin-spacer] {
-    padding-bottom: 150svh;
+    padding-bottom: 300svh;
   }
 }
 
@@ -225,10 +226,12 @@ body::after {
   }
 }
 
-/* Hero title rises and dims as the stage assembles (decision a). --assembly is 0–1, set by useStageSection. */
+/* Hero title rises and dims in the first quarter of the pin (decision a), leaving the stage clear for
+   the lights and the show. --assembly is 0–1, set by useStageSection. */
 #cue-1 h1 {
-  transform: translateY(calc(var(--assembly, 0) * -22vh));
-  opacity: calc(1 - var(--assembly, 0) * 0.85);
+  --title-out: min(1, calc(var(--assembly, 0) * 4));
+  transform: translateY(calc(var(--title-out) * -22vh));
+  opacity: calc(1 - var(--title-out) * 0.85);
   will-change: transform, opacity;
 }
 

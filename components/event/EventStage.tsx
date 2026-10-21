@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react'
 import { useConsole } from '@/console/store'
-import { assembledCount } from '@/stage/assembly'
+import { assembledCount, stagePhase } from '@/stage/assembly'
 import { generateStage } from '@/stage/generateStage'
 import { StageSvg } from '@/stage/StageSvg'
 import { useStageSection } from '@/stage/useStageSection'
@@ -27,7 +27,9 @@ export function EventStage({ seed, name }: { seed: number; name: string }) {
       />
       <p className="sr-only">The stage built for {name} assembles as you scroll.</p>
       <div className="label absolute right-5 top-6 space-y-1 text-right md:right-10" aria-hidden="true">
-        <p>ASSEMBLY {String(percent).padStart(3, '0')}%</p>
+        <p>
+          {stagePhase(percent / 100)} {String(percent).padStart(3, '0')}%
+        </p>
         <p>
           PARTS {assembledCount(stage, percent / 100)}/{stage.parts.length}
         </p>
