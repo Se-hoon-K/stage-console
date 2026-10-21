@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { stageView } from './view'
+import { showStageFor, stageView } from './view'
 
 describe('stageView', () => {
   beforeEach(() => stageView.reset())
@@ -26,5 +26,29 @@ describe('stageView', () => {
     stageView.set({ visible: false, seed: 9 })
     expect(fn).toHaveBeenCalledTimes(1)
     off()
+  })
+})
+
+describe('showStageFor', () => {
+  beforeEach(() => stageView.reset())
+
+  it('is visible while any owner is on, hidden when all are off', () => {
+    const hero = {}
+    const backdrop = {}
+    showStageFor(hero, true)
+    expect(stageView.get().visible).toBe(true)
+    showStageFor(backdrop, true)
+    showStageFor(hero, false)
+    expect(stageView.get().visible).toBe(true)
+    showStageFor(backdrop, false)
+    expect(stageView.get().visible).toBe(false)
+  })
+
+  it('treats repeated calls for the same owner as one source', () => {
+    const a = {}
+    showStageFor(a, true)
+    showStageFor(a, true)
+    showStageFor(a, false)
+    expect(stageView.get().visible).toBe(false)
   })
 })

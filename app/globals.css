@@ -356,3 +356,9 @@ html[data-preloaded] .preloader {
     padding: 12px 16px;
   }
 }
+
+/* A see-through section: the stage canvas keeps playing behind it, under a scrim that keeps text legible. */
+.stage-backdrop {
+  position: relative;
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--color-stage) 35%, transparent), color-mix(in oklab, var(--color-stage) 80%, transparent) 40%, var(--color-stage));
+}

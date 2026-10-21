@@ -2,10 +2,12 @@
 
 import { useEffect, useRef } from 'react'
 import { gsap, SplitText } from '@/lib/gsap'
+import { useStageBackdrop } from '@/stage/useStageBackdrop'
 
 /** Words fill in from outline as the section scrolls through, like lights being raised. */
 export function Manifesto({ lines }: { lines: string[] }) {
   const ref = useRef<HTMLDivElement>(null)
+  useStageBackdrop(ref)
 
   useEffect(() => {
     const el = ref.current

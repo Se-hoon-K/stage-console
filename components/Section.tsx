@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import { CUES, cueLabel, type CueNumber } from '@/content/cues'
 
-type Props = { cue: CueNumber; level?: 1 | 2; className?: string; children?: ReactNode }
+type Props = { cue: CueNumber; level?: 1 | 2; bare?: boolean; className?: string; children?: ReactNode }
 
-export function Section({ cue, level = 2, className = '', children }: Props) {
+export function Section({ cue, level = 2, bare, className = '', children }: Props) {
   const { label, title } = CUES[cue - 1]
   const Heading = level === 1 ? 'h1' : 'h2'
   const headingClass =
@@ -17,7 +17,7 @@ export function Section({ cue, level = 2, className = '', children }: Props) {
       data-cue={cue}
       tabIndex={-1}
       aria-labelledby={`cue-${cue}-title`}
-      className={`${cue === 1 ? '' : 'border-t border-line bg-stage'} px-5 py-24 md:px-10 ${className}`}
+      className={`${cue === 1 ? '' : `border-t border-line ${bare ? 'stage-backdrop' : 'bg-stage'}`} px-5 py-24 md:px-10 ${className}`}
     >
       <p className="label mb-6">
         {cueLabel(cue)} — {label}

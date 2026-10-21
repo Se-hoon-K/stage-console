@@ -3,7 +3,7 @@
 import { type RefObject, useLayoutEffect } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { PIN_LENGTH } from './assembly'
-import { stageView } from './view'
+import { showStageFor, stageView } from './view'
 
 type Options = { seed: number; end?: string }
 
@@ -17,7 +17,7 @@ export function useStageSection(ref: RefObject<HTMLElement | null>, { seed, end 
 
     let io: IntersectionObserver | undefined
     if ('IntersectionObserver' in window) {
-      io = new IntersectionObserver(([entry]) => stageView.set({ visible: entry.isIntersecting }))
+      io = new IntersectionObserver(([entry]) => showStageFor(section, entry.isIntersecting))
       io.observe(section)
     }
 
@@ -25,7 +25,7 @@ export function useStageSection(ref: RefObject<HTMLElement | null>, { seed, end 
       stageView.set({ progress: 1 })
       return () => {
         io?.disconnect()
-        stageView.set({ visible: false })
+        showStageFor(section, false)
       }
     }
 
@@ -53,7 +53,7 @@ export function useStageSection(ref: RefObject<HTMLElement | null>, { seed, end 
     return () => {
       ctx.revert()
       io?.disconnect()
-      stageView.set({ visible: false })
+      showStageFor(section, false)
     }
   }, [ref, seed, end])
 }
