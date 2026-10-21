@@ -55,12 +55,21 @@ describe('Preloader', () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance'] })
     render(<Preloader />)
     act(() => {
-      vi.advanceTimersByTime(3200)
+      vi.advanceTimersByTime(1300)
     })
     expect(screen.getByRole('status')).toBeInTheDocument()
     act(() => {
       vi.advanceTimersByTime(1500)
     })
     expect(screen.queryByRole('status')).toBeNull()
+  })
+
+  it('does not wait for the 3 s cap when the Font Loading API is absent', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance'] })
+    const { container } = render(<Preloader />)
+    act(() => {
+      vi.advanceTimersByTime(1300)
+    })
+    expect(container.querySelector('.preloader-count')).toHaveTextContent('100')
   })
 })

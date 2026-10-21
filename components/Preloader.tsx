@@ -5,7 +5,7 @@ import { gsap } from '@/lib/gsap'
 import { stageView } from '@/stage/view'
 import { canUseWebGL } from '@/webgl/support'
 
-const KEY = 'stage-console:preloaded'
+export const KEY = 'stage-console:preloaded'
 const CHANNELS = 8
 
 export function preloadPercent(elapsedMs: number, ready: boolean) {
@@ -41,7 +41,7 @@ export function Preloader() {
     }
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const webgl = canUseWebGL()
-    let fontsReady = false
+    let fontsReady = !document.fonts
     void document.fonts?.ready.then(() => (fontsReady = true))
     const start = performance.now()
     let raf = 0

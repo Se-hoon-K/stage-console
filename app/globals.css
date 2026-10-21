@@ -303,3 +303,7 @@ body::after {
   line-height: 0.8;
   font-variant-numeric: tabular-nums;
 }
+
+html[data-preloaded] .preloader {
+  display: none;
+}
