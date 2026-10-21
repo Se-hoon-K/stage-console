@@ -58,6 +58,13 @@ Every change landed through a pull request with CI. The design spec and the task
 Concept, design and development: **Sehoon Ko** · [GitHub](https://github.com/Se-hoon-K)
 `[AGENCY]` and its shows are fictional.
 
+3D models (in `public/models`, see [CREDITS.md](public/models/CREDITS.md)):
+
+- [Moving Head Beam (high Poly)](https://sketchfab.com/3d-models/ce283a1277bb4e98bd29b157075e003f) by Lord Henry, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — optimised (meshopt, WebP textures, simplified)
+- [Square Truss Straight Segment 21](https://sketchfab.com/3d-models/f43719b6267645a587a9d3959b5f2d2b) by akerStudio, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — optimised (meshopt, WebP textures, simplified)
+- [Line Array](https://sketchfab.com/3d-models/cc558455c6d141ccb69c23222af46c8a) by Wilmer.Jose.Saumeth.Suarez, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — optimised (meshopt, WebP textures, simplified)
+- [Stage Light](https://sketchfab.com/3d-models/d3e138ecee20439d939d27cbdba208d1) by Daniyal Malik, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — optimised (meshopt, WebP textures, simplified)
+
 ## License
 
 MIT

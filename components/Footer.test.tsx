@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { agency } from '@/content/agency'
+import { modelCredits } from '@/content/credits'
 import { Footer } from './Footer'
 
 describe('Footer credits', () => {
@@ -25,5 +26,14 @@ describe('Footer credits', () => {
     agency.credits.linkedin = 'https://www.linkedin.com/in/example'
     render(<Footer />)
     expect(screen.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute('href', 'https://www.linkedin.com/in/example')
+  })
+
+  it('credits every third-party model with its licence', () => {
+    render(<Footer />)
+    for (const m of modelCredits) {
+      expect(screen.getByRole('link', { name: m.title })).toHaveAttribute('href', m.url)
+      expect(screen.getByRole('contentinfo')).toHaveTextContent(`${m.title} by ${m.author} (${m.licence})`)
+    }
+    expect(screen.getAllByRole('link', { name: 'CC BY 4.0' })).toHaveLength(modelCredits.length)
   })
 })
