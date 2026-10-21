@@ -78,4 +78,21 @@ describe('Console', () => {
     wheel()
     expect(tempo).toHaveAttribute('aria-valuenow', '130')
   })
+
+  it('has a phone toggle that opens and closes the panel (button and Escape)', () => {
+    render(<Console />)
+    const toggle = screen.getByRole('button', { name: 'Console' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(toggle).toHaveAttribute('aria-controls', 'console-panel')
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('region', { name: 'Show console' })).toHaveAttribute('data-open', 'true')
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('shows the current cue on the phone bar', () => {
+    render(<Console />)
+    expect(screen.getByText('CUE 01 — Show')).toBeInTheDocument()
+  })
 })
