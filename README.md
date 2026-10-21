@@ -12,7 +12,7 @@ All of my professional work is under NDA, so this site is the portfolio piece.
 - **Procedural stage** — `generateStage(seed)` returns plain data (deck, truss, line arrays, moving heads, LED wall). The same data renders as instanced WebGL and as an SVG elevation fallback.
 - **Playable console** — native range inputs and ARIA sliders; keyboard, wheel and drag; synthesized Web Audio (no audio files).
 - **One persistent canvas** — shared across routes; each page tells it which seed to show and how far to build.
-- **Accessible by default** — reduced motion shows the finished stage without pinning or animation; no WebGL falls back to SVG; every control is keyboard-operable.
+- **Accessible by default** — reduced motion shows the finished stage without pinning or animation; no WebGL falls back to SVG; the console's controls are keyboard-operable.
 
 ## Architecture
 
@@ -34,7 +34,11 @@ Next.js (App Router, TypeScript) · Tailwind CSS · GSAP (ScrollTrigger, SplitTe
 | Console in DOM, stage in WebGL | Accessibility and speed; 3D only where it earns its cost |
 | Procedural geometry | No asset licensing, tiny payload, a different stage per show |
 | One external store, read per frame | Faders move the rig without React re-renders |
-| 3D chunk loaded lazily and only with WebGL | First-load JS stays within budget |
+| 3D chunk loaded lazily and only with WebGL | First-load JS for the home page stays within a ~250 KB gzip budget |
+
+## Known issues
+
+- No sound in Safari yet — tracked in [#14](https://github.com/Se-hoon-K/stage-console/issues/14). Chrome, Edge and Firefox play the pads.
 
 ## Run locally
 
