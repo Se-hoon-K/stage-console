@@ -3,7 +3,7 @@ import { createStore } from '@/lib/store'
 
 export type StageViewState = { seed: number; progress: number; visible: boolean; webglReady: boolean }
 
-const base = createStore<StageViewState>({ seed: agency.heroSeed, progress: 0, visible: true, webglReady: false })
+const base = createStore<StageViewState>({ seed: agency.heroSeed, progress: 0, visible: false, webglReady: false })
 // Sections currently showing the canvas (the pinned stage, backdrop sections). Visible while any is on.
 const owners = new Set<object>()
 

@@ -1,6 +1,6 @@
 # 3D model credits
 
-All models are from Sketchfab, licensed under Creative Commons Attribution 4.0, and were modified (optimised with gltf-transform: meshopt compression, WebP textures, simplification; the truss was re-oriented at load).
+All models are from Sketchfab, licensed under Creative Commons Attribution 4.0, and were modified (optimised with gltf-transform: meshopt compression, simplification, WebP textures where present; the truss was re-oriented at load).
 
 - [Moving Head Beam (high Poly)](https://sketchfab.com/3d-models/ce283a1277bb4e98bd29b157075e003f) by Lord Henry, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - [Square Truss Straight Segment 21](https://sketchfab.com/3d-models/f43719b6267645a587a9d3959b5f2d2b) by akerStudio, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)

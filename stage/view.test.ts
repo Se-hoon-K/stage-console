@@ -4,8 +4,8 @@ import { showStageFor, stageView } from './view'
 describe('stageView', () => {
   beforeEach(() => stageView.reset())
 
-  it('starts on the hero seed, not ready, visible, progress 0', () => {
-    expect(stageView.get()).toEqual({ seed: 7, progress: 0, visible: true, webglReady: false })
+  it('starts on the hero seed, not ready, hidden until a section claims it, progress 0', () => {
+    expect(stageView.get()).toEqual({ seed: 7, progress: 0, visible: false, webglReady: false })
   })
 
   it('clamps progress to 0–1 and ignores NaN', () => {
@@ -21,9 +21,9 @@ describe('stageView', () => {
   it('notifies only when something changed', () => {
     const fn = vi.fn()
     const off = stageView.subscribe(fn)
-    stageView.set({ visible: true })
+    stageView.set({ visible: false })
     expect(fn).not.toHaveBeenCalled()
-    stageView.set({ visible: false, seed: 9 })
+    stageView.set({ visible: true, seed: 9 })
     expect(fn).toHaveBeenCalledTimes(1)
     off()
   })

@@ -23,7 +23,7 @@ export function Footer() {
         </li>
       </ul>
       <p className="mt-6 max-w-3xl normal-case tracking-normal">
-        3D models (optimised):{' '}
+        3D models, modified (optimised):{' '}
         {modelCredits.map((m, i) => (
           <span key={m.url}>
             {i > 0 && ' · '}

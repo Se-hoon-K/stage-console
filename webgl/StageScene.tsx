@@ -106,14 +106,14 @@ function Environment() {
     const { gl, scene } = get()
     const pmrem = new THREE.PMREMGenerator(gl)
     const room = new RoomEnvironment()
-    const env = pmrem.fromScene(room, 0.04).texture
+    const envTarget = pmrem.fromScene(room, 0.04)
     room.dispose()
     pmrem.dispose()
-    scene.environment = env
+    scene.environment = envTarget.texture
     scene.environmentIntensity = 0.35
     return () => {
       scene.environment = null
-      env.dispose()
+      envTarget.dispose() // frees the cube-UV framebuffer, not just its texture
     }
   }, [get])
   return null
