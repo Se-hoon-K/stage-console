@@ -81,7 +81,6 @@ describe('useStageSection', () => {
     render(<Probe seed={7} />)
     expect(pinSpacer()).toBeUndefined()
   })
-})
 
 it('pins with explicit padding spacing and the shared default length', () => {
   render(<Probe seed={7} />)
@@ -93,4 +92,5 @@ it('pins with explicit padding spacing and the shared default length', () => {
 it('reserves exactly the default pin length in CSS (no jump at hydration)', () => {
   const css = readFileSync('app/globals.css', 'utf8')
   expect(css).toMatch(new RegExp(`\\[data-pin-spacer\\]\\s*{\\s*padding-bottom:\\s*${PIN_LENGTH}svh`))
+})
 })

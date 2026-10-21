@@ -119,7 +119,7 @@ function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
       const hung = p.position[1] > BEAM_MIN_HEIGHT
       const h = hung ? obj.position.y : 0
       const aim = hung ? beamAim({ show, index: i, count: lights.length, time, reduced }) : { pan: 0, tilt: 0 }
-      obj.rotation.set(aim.tilt, 0, aim.pan) // tilt about x leans the beam toward the audience (+z)
+      obj.rotation.set(-aim.tilt, 0, aim.pan) // beams hang along -y; negative x rotation leans them toward the audience (+z)
       obj.scale.set(h, h, h)
       obj.updateMatrix()
       beams.setMatrixAt(i, obj.matrix)
