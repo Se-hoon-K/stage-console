@@ -4,8 +4,10 @@ import { Console } from '@/components/console/Console'
 import { ConsoleCssVars } from '@/components/ConsoleCssVars'
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
+import { Preloader } from '@/components/Preloader'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { agency } from '@/content/agency'
+import { PRELOADED_KEY } from '@/lib/preloaderKey'
 import { Scene } from '@/webgl/Scene'
 import './globals.css'
 
@@ -19,7 +21,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${archivo.variable} ${plexMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${archivo.variable} ${plexMono.variable}`}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(sessionStorage.getItem(${JSON.stringify(PRELOADED_KEY)})==='1')document.documentElement.setAttribute('data-preloaded','')}catch(e){}`,
+          }}
+        />
+        <noscript>
+          <style>{'.preloader{display:none}'}</style>
+        </noscript>
+      </head>
       <body>
         <SmoothScroll />
         <ConsoleCssVars />
@@ -29,6 +41,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Scene />
         <main id="main" className="relative z-10">{children}</main>
         <Footer />
+        <Preloader />
         <div id="shutter" aria-hidden="true" className="shutter" />
       </body>
     </html>
