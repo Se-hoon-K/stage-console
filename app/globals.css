@@ -27,6 +27,25 @@
   }
 }
 
+/* ScrollTrigger copies the pinned section's display onto the spacer. Keep it constant (a display
+   swap at hydration relayouts the hero and counts as a layout shift) and keep the section full
+   width inside it (otherwise it shrink-wraps to its widest line and the pinned title re-wraps). */
+[data-pin-spacer] {
+  display: flex !important;
+}
+
+[data-pin-spacer] > section {
+  width: 100%;
+}
+
+/* Reserve the pin's scroll length (useStageSection end: '+=150%') before ScrollTrigger adds it at
+   hydration, so the content below does not jump. Only where the pin will exist: JS on, motion allowed. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-js] [data-pin-spacer] {
+    padding-bottom: 150svh;
+  }
+}
+
 h1[tabindex='-1']:focus {
   outline: none;
 }

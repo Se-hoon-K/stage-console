@@ -30,7 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{if(sessionStorage.getItem(${JSON.stringify(PRELOADED_KEY)})==='1')document.documentElement.setAttribute('data-preloaded','')}catch(e){}`,
+            __html: `document.documentElement.setAttribute('data-js','');try{if(sessionStorage.getItem(${JSON.stringify(PRELOADED_KEY)})==='1')document.documentElement.setAttribute('data-preloaded','')}catch(e){}`,
           }}
         />
         <noscript>
