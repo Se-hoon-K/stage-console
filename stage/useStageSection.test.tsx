@@ -1,7 +1,7 @@
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { useRef } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ScrollTrigger } from '@/lib/gsap'
+import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { stageView } from './view'
 import { useStageSection } from './useStageSection'
 
@@ -58,5 +58,16 @@ describe('useStageSection', () => {
     stageView.set({ visible: true })
     unmount()
     expect(stageView.get().visible).toBe(false)
+  })
+
+  it('reverts GSAP DOM changes when the tree is replaced (layout cleanup, before React places the next route)', () => {
+    const revert = vi.mocked(gsap.context).mock.results.at(-1)?.value.revert as ReturnType<typeof vi.fn> | undefined
+    revert?.mockClear()
+    const { rerender } = render(<Probe seed={7} />)
+    const ctxRevert = vi.mocked(gsap.context).mock.results.at(-1)!.value.revert as ReturnType<typeof vi.fn>
+    ctxRevert.mockClear()
+    rerender(<p>next</p>)
+    expect(ctxRevert).toHaveBeenCalled()
+    expect(screen.getByText('next')).toBeInTheDocument()
   })
 })
