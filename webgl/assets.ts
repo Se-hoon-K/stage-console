@@ -39,7 +39,10 @@ export function useStageAssets(): StageAssets {
   const [assets, setAssets] = useState<StageAssets>({})
   useEffect(() => {
     let live = true
-    ;(pending ??= loadStageAssets()).then((a) => live && setAssets(a))
+    ;(pending ??= loadStageAssets()).then((a) => {
+      if (Object.keys(a).length === 0) pending = undefined // nothing loaded (offline?): retry on the next mount
+      if (live) setAssets(a)
+    })
     return () => {
       live = false
     }
@@ -92,7 +95,9 @@ function toModel(kind: FixtureKind, gltf: GLTF): FixtureModel {
   box.applyMatrix4(turn)
 
   const center = box.getCenter(new THREE.Vector3())
-  const scale = 1 / (box.max.y - box.min.y)
+  const height = box.max.y - box.min.y
+  if (!(height > 0)) throw new Error(`${kind}: model has no height`) // falls back to procedural geometry
+  const scale = 1 / height
   const fit = new THREE.Matrix4()
     .makeScale(scale, scale, scale)
     .multiply(new THREE.Matrix4().makeTranslation(-center.x, -box.min.y, -center.z))
