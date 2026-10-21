@@ -22,7 +22,7 @@ export function Section({ cue, level = 2, className = '', children }: Props) {
       <p className="label mb-6">
         {cueLabel(cue)} — {label}
       </p>
-      <Heading id={`cue-${cue}-title`} className={headingClass}>
+      <Heading id={`cue-${cue}-title`} tabIndex={level === 1 ? -1 : undefined} className={headingClass}>
         {title}
       </Heading>
       {children}

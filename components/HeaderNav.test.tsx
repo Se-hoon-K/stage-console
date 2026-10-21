@@ -1,8 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { expect, it, vi } from 'vitest'
+import { scrollToCue } from '@/lib/scroll'
 import { HeaderNav } from './HeaderNav'
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
+const pathname = vi.hoisted(() => ({ value: '/events/x' }))
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => pathname.value }))
+vi.mock('@/lib/scroll', () => ({ scrollToCue: vi.fn(() => true) }))
 
 it('has a phone menu toggle that reveals the cue links', () => {
   render(<HeaderNav />)
@@ -20,4 +23,12 @@ it('closes on Escape and returns focus to the Menu button', () => {
   fireEvent.keyDown(document, { key: 'Escape' })
   expect(toggle).toHaveAttribute('aria-expanded', 'false')
   expect(toggle).toHaveFocus()
+})
+
+it('on the home page a cue link scrolls instead of navigating', () => {
+  pathname.value = '/'
+  render(<HeaderNav />)
+  fireEvent.click(screen.getByRole('link', { name: 'Work' }))
+  expect(scrollToCue).toHaveBeenCalledWith(3)
+  pathname.value = '/events/x'
 })

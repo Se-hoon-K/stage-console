@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { gsap } from '@/lib/gsap'
-import { closeShutter, openShutter } from './transition'
+import { closeShutter, isTransitioning, openShutter } from './transition'
 
 vi.mock('@/lib/gsap')
 
@@ -32,6 +32,19 @@ describe('shutter', () => {
       expect(done).toBe(false)
       await vi.advanceTimersByTimeAsync(1)
       expect(done).toBe(true)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('lifts the shutter by itself after 4 s if nobody opened it', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.mocked(gsap.fromTo).mockImplementation((() => {}) as never)
+      void closeShutter()
+      expect(isTransitioning()).toBe(true)
+      await vi.advanceTimersByTimeAsync(4000)
+      expect(isTransitioning()).toBe(false)
     } finally {
       vi.useRealTimers()
     }

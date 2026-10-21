@@ -28,7 +28,7 @@ export function RunSheet({ items }: { items: Item[] }) {
       <h2 id="run-sheet-title" className="label mb-10">
         Run sheet
       </h2>
-      <ol ref={list} aria-label="Run sheet" className="border-t border-line">
+      <ol ref={list} aria-labelledby="run-sheet-title" className="border-t border-line">
         {items.map((item, i) => (
           <li
             key={`${item.time}-${item.cue}`}
