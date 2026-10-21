@@ -2,10 +2,10 @@
 
 import { type CSSProperties, useEffect, useRef, useState } from 'react'
 import { gsap } from '@/lib/gsap'
+import { PRELOADED_KEY } from '@/lib/preloaderKey'
 import { stageView } from '@/stage/view'
 import { canUseWebGL } from '@/webgl/support'
 
-export const KEY = 'stage-console:preloaded'
 const CHANNELS = 8
 
 export function preloadPercent(elapsedMs: number, ready: boolean) {
@@ -16,7 +16,7 @@ export function preloadPercent(elapsedMs: number, ready: boolean) {
 
 function alreadySeen() {
   try {
-    return sessionStorage.getItem(KEY) === '1'
+    return sessionStorage.getItem(PRELOADED_KEY) === '1'
   } catch {
     return false
   }
@@ -24,7 +24,7 @@ function alreadySeen() {
 
 function markSeen() {
   try {
-    sessionStorage.setItem(KEY, '1')
+    sessionStorage.setItem(PRELOADED_KEY, '1')
   } catch {}
 }
 
