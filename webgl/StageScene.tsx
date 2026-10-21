@@ -7,23 +7,26 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { onPadHit } from '@/console/padEvents'
 import { consoleStore } from '@/console/store'
-import { lightsOn, partOffset } from '@/stage/assembly'
+import { ASSEMBLY_END, lightsOn, partOffset, showProgress } from '@/stage/assembly'
 import { generateStage, type Part } from '@/stage/generateStage'
-import { lightLevel } from '@/stage/lighting'
+import { beamAim, lightLevel } from '@/stage/lighting'
 import { fitDistance } from '@/stage/camera'
 import { stageView, useStageView } from '@/stage/view'
 import { createBeamMaterial } from './beamMaterial'
+import { createFlareTexture } from './flare'
 
 type BodyKind = 'deck' | 'truss' | 'speaker' | 'screen'
 const BODY_KINDS: BodyKind[] = ['deck', 'truss', 'speaker', 'screen']
 const BODY_COLORS: Record<BodyKind, string> = { deck: '#262626', truss: '#1c1c1c', speaker: '#111111', screen: '#0a0a0a' }
 const BEAM_MIN_HEIGHT = 3
+const NO_AIM = { pan: 0, tilt: 0 }
 
 // Scratch objects reused every frame (no per-frame allocation).
 const obj = new THREE.Object3D()
 const col = new THREE.Color()
 const hueCol = new THREE.Color()
 const camTarget = new THREE.Vector3()
+const toCam = new THREE.Vector3()
 // Pad flash, 1 on hit, decays to 0. One scene at a time, so module scope is fine.
 const flash = { value: 0 }
 
@@ -58,44 +61,54 @@ function Bodies({ kind, parts }: { kind: BodyKind; parts: Part[] }) {
 
 function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
   const lensRef = useRef<THREE.InstancedMesh>(null)
+  const flareRef = useRef<THREE.InstancedMesh>(null)
   const beamRef = useRef<THREE.InstancedMesh>(null)
   const washRef = useRef<THREE.PointLight>(null)
 
   const beamGeometry = useMemo(() => {
-    const g = new THREE.ConeGeometry(0.3, 1, 32, 1, true)
-    g.translate(0, -0.5, 0) // apex at the fixture, base 1 unit below
+    const g = new THREE.CylinderGeometry(0.04, 0.13, 1, 48, 24, true)
+    g.translate(0, -0.5, 0) // narrow end at the fixture, wide end 1 unit below
     g.setAttribute('aLevel', new THREE.InstancedBufferAttribute(new Float32Array(lights.length), 1))
     return g
   }, [lights.length])
   const beamMaterial = useMemo(() => createBeamMaterial(), [])
+  // Lens disc faces along the beam (-y), sitting just in front of the fixture.
+  const lensGeometry = useMemo(() => new THREE.CircleGeometry(0.16, 32).rotateX(Math.PI / 2).translate(0, -0.02, 0), [])
+  const flare = useMemo(() => createFlareTexture(), [])
   useEffect(
     () => () => {
       beamGeometry.dispose()
       beamMaterial.dispose()
+      lensGeometry.dispose()
+      flare.dispose()
     },
-    [beamGeometry, beamMaterial],
+    [beamGeometry, beamMaterial, lensGeometry, flare],
   )
 
-  // instanceColor must exist before the first render so the lens material compiles with it.
+  // instanceColor must exist before the first render so the materials compile with it.
   useLayoutEffect(() => {
-    const lens = lensRef.current
-    if (!lens) return
-    for (let i = 0; i < lights.length; i++) lens.setColorAt(i, col.setRGB(0, 0, 0))
-    if (lens.instanceColor) lens.instanceColor.needsUpdate = true
+    for (const mesh of [lensRef.current, flareRef.current]) {
+      if (!mesh) continue
+      for (let i = 0; i < lights.length; i++) mesh.setColorAt(i, col.setRGB(0, 0, 0))
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+    }
   }, [lights.length])
 
   useFrame((state) => {
     const lens = lensRef.current
+    const flares = flareRef.current
     const beams = beamRef.current
-    if (!lens || !beams) return
+    if (!lens || !flares || !beams) return
     const { progress } = stageView.get()
     const c = consoleStore.get()
     const time = state.clock.elapsedTime
+    const show = showProgress(progress)
     hueCol.setHSL(c.hue / 360, 1, 0.55)
     // Read material/geometry back off the mesh so the compiler sees no mutation of memoised values.
     const mat = beams.material as THREE.ShaderMaterial
     mat.uniforms.uColor.value.copy(hueCol)
-    mat.uniforms.uTime.value = time
+    mat.uniforms.uTime.value = reduced ? 0 : time % 256 // still haze under reduced motion; bounded for mobile float precision
+    mat.uniforms.uHaze.value = c.fog
     const levels = beams.geometry.getAttribute('aLevel') as THREE.InstancedBufferAttribute
 
     let sum = 0
@@ -110,22 +123,35 @@ function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
       sum += level
 
       placePart(p, progress)
+      const hung = p.position[1] > BEAM_MIN_HEIGHT
+
+      const h = hung ? obj.position.y : 0
+      const aim = hung ? beamAim({ show, index: i, count: lights.length, time, reduced }) : NO_AIM
+      // Beams hang along -y; negative x rotation leans them toward the audience (+z). Ground washes face the audience.
+      obj.rotation.set(hung ? -aim.tilt : -Math.PI / 2, 0, aim.pan)
       obj.scale.setScalar(1)
       obj.updateMatrix()
       lens.setMatrixAt(i, obj.matrix)
       lens.setColorAt(i, col.copy(hueCol).multiplyScalar(0.15 + level * 2.5))
 
-      const hung = p.position[1] > BEAM_MIN_HEIGHT
-      const h = hung ? obj.position.y : 0
-      obj.rotation.set(0, 0, hung && !reduced ? Math.sin(time * 0.6 + i) * 0.25 : 0)
       obj.scale.set(h, h, h)
       obj.updateMatrix()
       beams.setMatrixAt(i, obj.matrix)
+
+      // Flare: camera-facing glow, nudged toward the camera so the deck doesn't clip ground washes.
+      obj.position.addScaledVector(toCam.subVectors(state.camera.position, obj.position).normalize(), 0.4)
+      obj.quaternion.copy(state.camera.quaternion)
+      obj.scale.setScalar(0.4 + level * 0.9)
+      obj.updateMatrix()
+      flares.setMatrixAt(i, obj.matrix)
+      flares.setColorAt(i, col.copy(hueCol).multiplyScalar(level))
     }
 
     levels.needsUpdate = true
     lens.instanceMatrix.needsUpdate = true
     if (lens.instanceColor) lens.instanceColor.needsUpdate = true
+    flares.instanceMatrix.needsUpdate = true
+    if (flares.instanceColor) flares.instanceColor.needsUpdate = true
     beams.instanceMatrix.needsUpdate = true
     if (washRef.current) {
       washRef.current.color.copy(hueCol)
@@ -135,11 +161,14 @@ function Rig({ lights, reduced }: { lights: Part[]; reduced: boolean }) {
 
   return (
     <>
-      <instancedMesh ref={lensRef} args={[undefined, undefined, lights.length]} frustumCulled={false}>
-        <sphereGeometry args={[0.18, 12, 12]} />
+      <instancedMesh ref={lensRef} args={[lensGeometry, undefined, lights.length]} frustumCulled={false}>
         <meshBasicMaterial toneMapped={false} />
       </instancedMesh>
       <instancedMesh ref={beamRef} args={[beamGeometry, beamMaterial, lights.length]} frustumCulled={false} />
+      <instancedMesh ref={flareRef} args={[undefined, undefined, lights.length]} frustumCulled={false}>
+        <planeGeometry args={[1.2, 1.2]} />
+        <meshBasicMaterial map={flare} transparent depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+      </instancedMesh>
       <pointLight ref={washRef} position={[0, 6, 2]} distance={30} decay={1.5} intensity={0} />
     </>
   )
@@ -169,18 +198,26 @@ export function StageScene() {
     flash.value = Math.max(0, flash.value - dt * 4)
     const c = consoleStore.get()
     const { progress } = stageView.get()
-    if (fogRef.current) fogRef.current.density = 0.006 + c.fog * 0.035
+    const show = showProgress(progress)
+    if (fogRef.current) fogRef.current.density = 0.006 + c.fog * 0.035 + show * 0.01
 
-    const p = Math.min(progress / 0.8, 1)
-    const live = progress >= 1 && !reduced
+    const p = Math.min(progress / ASSEMBLY_END, 1)
+    const live = progress >= ASSEMBLY_END && !reduced
     const fitZ = fitDistance(stage.bounds[0], (state.camera as THREE.PerspectiveCamera).fov, state.size.width / state.size.height)
     const startZ = Math.max(30, fitZ * 1.4)
     const endZ = Math.max(19, fitZ)
-    camTarget.set(live ? state.pointer.x * 0.8 : 0, 7 - 2.5 * p + (live ? state.pointer.y * 0.4 : 0), startZ + (endZ - startZ) * p)
+    // Show: arc ~18° around the stage and push in 8%.
+    const angle = (reduced ? 0 : show) * THREE.MathUtils.degToRad(18)
+    const dist = (startZ + (endZ - startZ) * p) * (1 - 0.08 * (reduced ? 0 : show))
+    camTarget.set(
+      Math.sin(angle) * dist + (live ? state.pointer.x * 0.8 : 0),
+      7 - 2.5 * p - 0.5 * show + (live ? state.pointer.y * 0.4 : 0),
+      Math.cos(angle) * dist,
+    )
     state.camera.position.lerp(camTarget, reduced ? 1 : 0.08)
-    state.camera.lookAt(0, 3, 0)
+    state.camera.lookAt(0, 3 + 1.2 * (reduced ? 1 : showProgress(progress)), 0) // tilt up during the show so the rig and its lenses stay in frame
 
-    if (bloomRef.current) bloomRef.current.intensity = 0.6 + flash.value * 1.4
+    if (bloomRef.current) bloomRef.current.intensity = 0.5 + flash.value * 1.4
   })
 
   return (
@@ -195,7 +232,7 @@ export function StageScene() {
       </group>
       {!lite && (
         <EffectComposer multisampling={0}>
-          <Bloom ref={bloomRef} mipmapBlur luminanceThreshold={0.4} intensity={0.6} />
+          <Bloom ref={bloomRef} mipmapBlur luminanceThreshold={0.55} intensity={0.5} />
         </EffectComposer>
       )}
     </>

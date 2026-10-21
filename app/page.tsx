@@ -16,7 +16,7 @@ export default function Home() {
       </Section>
       </div>
 
-      <Section cue={2}>
+      <Section cue={2} bare>
         <Manifesto lines={agency.manifesto} />
       </Section>
 

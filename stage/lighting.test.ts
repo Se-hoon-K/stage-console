@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { lightLevel } from './lighting'
+import { beamAim, lightLevel } from './lighting'
 
 describe('lightLevel', () => {
   const base = { index: 0, count: 8, time: 0, tempo: 120 }
 
   it('is dark before the lights switch on', () => {
-    expect(lightLevel({ ...base, progress: 0.5 })).toBe(0)
+    expect(lightLevel({ ...base, progress: 0.3 })).toBe(0)
   })
 
   it('stays between 0.35 and 1 once on', () => {
@@ -26,5 +26,47 @@ describe('lightLevel', () => {
     const a = lightLevel({ ...base, progress: 1, index: 0 })
     const b = lightLevel({ ...base, progress: 1, index: 4 })
     expect(a).not.toBeCloseTo(b)
+  })
+})
+
+describe('beamAim', () => {
+  const base = { index: 0, count: 8, time: 0, reduced: false }
+
+  it('fans out at the start of the show: outer beams lean outward', () => {
+    const left = beamAim({ ...base, show: 0, index: 0 })
+    const right = beamAim({ ...base, show: 0, index: 7 })
+    expect(left.pan).toBeLessThan(0)
+    expect(right.pan).toBeGreaterThan(0)
+  })
+
+  it('crosses in the middle: outer beams lean inward', () => {
+    const left = beamAim({ ...base, show: 0.5, index: 0 })
+    const right = beamAim({ ...base, show: 0.5, index: 7 })
+    expect(left.pan).toBeGreaterThan(0)
+    expect(right.pan).toBeLessThan(0)
+  })
+
+  it('punches to centre at the end: every beam converges (small pan) and tilts toward the audience', () => {
+    for (let i = 0; i < 8; i++) {
+      const a = beamAim({ ...base, show: 1, index: i })
+      expect(Math.abs(a.pan)).toBeLessThan(0.15)
+      expect(a.tilt).toBeGreaterThan(0.2)
+    }
+  })
+
+  it('stays put under reduced motion (no time sway)', () => {
+    const a = beamAim({ ...base, show: 1, reduced: true, time: 0 })
+    const b = beamAim({ ...base, show: 1, reduced: true, time: 3.7 })
+    expect(b).toEqual(a)
+  })
+
+  it('stays within ±0.6 rad', () => {
+    for (let s = 0; s <= 1; s += 0.1)
+      for (let i = 0; i < 8; i++)
+        for (let t = 0; t < 4; t += 0.5) {
+          const a = beamAim({ ...base, show: s, index: i, time: t })
+          expect(Math.abs(a.pan)).toBeLessThanOrEqual(0.6)
+          expect(Math.abs(a.tilt)).toBeLessThanOrEqual(0.6)
+        }
   })
 })

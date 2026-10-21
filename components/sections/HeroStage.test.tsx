@@ -47,7 +47,7 @@ describe('HeroStage', () => {
       onUpdate: (self: { progress: number }) => void
     }
     expect(config.pin).toBe(true)
-    expect(config.end).toBe('+=150%')
+    expect(config.end).toBe('+=300%')
     config.onUpdate({ progress: 0.64 })
     expect(stageView.get().progress).toBe(0.64)
   })
@@ -76,7 +76,7 @@ describe('HeroStage', () => {
     renderInSection()
     expect(ScrollTrigger.create).not.toHaveBeenCalled()
     expect(stageView.get().progress).toBe(1)
-    expect(screen.getByText(/ASSEMBLY 100%/)).toBeInTheDocument()
+    expect(screen.getByText(/SHOW 100%/)).toBeInTheDocument()
   })
 
   it('keeps the SVG stage visible until WebGL is ready, and describes it for screen readers', () => {

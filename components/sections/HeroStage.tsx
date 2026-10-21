@@ -4,7 +4,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useConsole } from '@/console/store'
 import { agency } from '@/content/agency'
 import { gsap, SplitText } from '@/lib/gsap'
-import { assembledCount } from '@/stage/assembly'
+import { assembledCount, stagePhase } from '@/stage/assembly'
 import { generateStage } from '@/stage/generateStage'
 import { StageSvg } from '@/stage/StageSvg'
 import { useStageSection } from '@/stage/useStageSection'
@@ -44,7 +44,9 @@ export function HeroStage() {
         lights follow the show console.
       </p>
       <div className="label absolute right-5 top-6 space-y-1 text-right md:right-10" aria-hidden="true">
-        <p>ASSEMBLY {String(percent).padStart(3, '0')}%</p>
+        <p>
+          {stagePhase(percent / 100)} {String(percent).padStart(3, '0')}%
+        </p>
         <p>
           PARTS {built}/{stage.parts.length}
         </p>
