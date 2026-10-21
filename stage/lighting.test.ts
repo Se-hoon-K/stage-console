@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { beamAim, lightLevel } from './lighting'
+import { beamAim, headAngles, lightLevel } from './lighting'
 
 describe('lightLevel', () => {
   const base = { index: 0, count: 8, time: 0, tempo: 120 }
@@ -68,5 +68,29 @@ describe('beamAim', () => {
           expect(Math.abs(a.pan)).toBeLessThanOrEqual(0.6)
           expect(Math.abs(a.tilt)).toBeLessThanOrEqual(0.6)
         }
+  })
+})
+
+describe('headAngles', () => {
+  // Beam direction from the beam's own Euler (x = -tilt, z = pan, XYZ order) applied to -y.
+  const beamDir = (pan: number, tilt: number) => [Math.sin(pan), -Math.cos(pan) * Math.cos(tilt), Math.cos(pan) * Math.sin(tilt)]
+  // Hung head: lens on +y, flipped upside down, tilted by `tilt` about x, then panned by `yaw` about world y.
+  const headDir = ({ yaw, tilt }: { yaw: number; tilt: number }) => [
+    Math.sin(tilt) * Math.sin(yaw),
+    -Math.cos(tilt),
+    Math.sin(tilt) * Math.cos(yaw),
+  ]
+
+  it('points the head where the beam points', () => {
+    for (const [pan, tilt] of [
+      [0, 0.1],
+      [0.45, 0.1],
+      [-0.4, 0.2],
+      [0.07, 0.35],
+      [0.3, -0.05],
+    ]) {
+      const want = beamDir(pan, tilt)
+      headDir(headAngles({ pan, tilt })).forEach((v, k) => expect(v).toBeCloseTo(want[k]))
+    }
   })
 })

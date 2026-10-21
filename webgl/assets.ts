@@ -79,6 +79,8 @@ function toModel(kind: FixtureKind, gltf: GLTF): FixtureModel {
     geometry.applyMatrix4(mesh.matrixWorld)
     const named = kind === 'movingHead' ? roleFromNames(mesh) : undefined
     const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material
+    // The source exports aluminium as metalness 0; set once at load, before anything shares it.
+    if (kind === 'truss' && material instanceof THREE.MeshStandardMaterial) Object.assign(material, { metalness: 0.85, roughness: 0.35 })
     meshes.push({ geometry, material, role: named ?? 'base', named: !!named })
   })
   if (!meshes.length) throw new Error(`${kind}: no meshes`)
