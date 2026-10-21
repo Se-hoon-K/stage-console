@@ -7,6 +7,9 @@ import { TransitionLink } from '@/components/TransitionLink'
 import { agency } from '@/content/agency'
 import { shows } from '@/content/shows'
 
+// Every slug is prerendered by generateStaticParams, and the page transition shutter covers the wait.
+export const instant = false
+
 type Props = { params: Promise<{ slug: string }> }
 
 export function formatShowDate(iso: string) {
