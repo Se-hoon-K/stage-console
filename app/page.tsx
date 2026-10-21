@@ -10,9 +10,11 @@ import { shows } from '@/content/shows'
 export default function Home() {
   return (
     <>
+      <div data-pin-spacer>
       <Section cue={1} level={1} className="relative isolate flex min-h-[calc(100svh-var(--console-h))] flex-col justify-end">
         <HeroStage />
       </Section>
+      </div>
 
       <Section cue={2}>
         <Manifesto lines={agency.manifesto} />

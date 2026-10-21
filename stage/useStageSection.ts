@@ -1,6 +1,6 @@
 'use client'
 
-import { type RefObject, useEffect } from 'react'
+import { type RefObject, useLayoutEffect } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { stageView } from './view'
 
@@ -8,7 +8,7 @@ type Options = { seed: number; end?: string }
 
 /** Binds a section to the persistent stage canvas: seed, visibility and scroll-driven assembly. */
 export function useStageSection(ref: RefObject<HTMLElement | null>, { seed, end = '+=150%' }: Options) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const node = ref.current
     const section = node?.closest('section') ?? node
     if (!section) return
@@ -32,12 +32,15 @@ export function useStageSection(ref: RefObject<HTMLElement | null>, { seed, end 
       stageView.set({ progress })
       section.style.setProperty('--assembly', String(progress))
     }
+    // React-owned spacer: ScrollTrigger must not re-parent a node React tracks.
+    const spacer = section.parentElement?.hasAttribute('data-pin-spacer') ? section.parentElement : undefined
     const ctx = gsap.context(() => {
       const trigger = ScrollTrigger.create({
         trigger: section,
         start: 'top top',
         end,
         pin: true,
+        pinSpacer: spacer,
         scrub: true,
         onUpdate: (self) => apply(self.progress),
       })

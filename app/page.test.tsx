@@ -3,6 +3,7 @@ import { expect, it, vi } from 'vitest'
 import Home from './page'
 
 vi.mock('@/lib/gsap')
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
 it('renders five cue sections, one h1, each labelled by its heading', () => {
   const { container } = render(<Home />)

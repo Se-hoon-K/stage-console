@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useConsole } from '@/console/store'
 import { agency } from '@/content/agency'
 import { gsap, SplitText } from '@/lib/gsap'
@@ -19,7 +19,7 @@ export function HeroStage() {
 
   useStageSection(ref, { seed: agency.heroSeed })
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const section = ref.current?.closest('section')
     const title = section?.querySelector('h1')
     if (!section || !title || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
