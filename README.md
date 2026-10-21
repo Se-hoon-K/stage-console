@@ -32,7 +32,7 @@ Next.js (App Router, TypeScript) · Tailwind CSS · GSAP (ScrollTrigger, SplitTe
 | Decision | Why |
 |---|---|
 | Console in DOM, stage in WebGL | Accessibility and speed; 3D only where it earns its cost |
-| Procedural geometry | No asset licensing, tiny payload, a different stage per show |
+| Procedural layout + optimised CC BY models | A different stage per show; the 444 KB of models load with the lazy 3D chunk, with a procedural fallback |
 | One external store, read per frame | Faders move the rig without React re-renders |
 | 3D chunk loaded lazily and only with WebGL | First-load JS for the home page stays within a ~250 KB gzip budget |
 
@@ -57,6 +57,13 @@ Every change landed through a pull request with CI. The design spec and the task
 
 Concept, design and development: **Sehoon Ko** · [GitHub](https://github.com/Se-hoon-K)
 `[AGENCY]` and its shows are fictional.
+
+3D models (in `public/models`, see [CREDITS.md](public/models/CREDITS.md)):
+
+- [Moving Head Beam (high Poly)](https://sketchfab.com/3d-models/ce283a1277bb4e98bd29b157075e003f) by Lord Henry, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — modified (optimised: meshopt, simplified, WebP textures where present)
+- [Square Truss Straight Segment 21](https://sketchfab.com/3d-models/f43719b6267645a587a9d3959b5f2d2b) by akerStudio, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — modified (optimised: meshopt, simplified, WebP textures where present)
+- [Line Array](https://sketchfab.com/3d-models/cc558455c6d141ccb69c23222af46c8a) by Wilmer.Jose.Saumeth.Suarez, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — modified (optimised: meshopt, simplified, WebP textures where present)
+- [Stage Light](https://sketchfab.com/3d-models/d3e138ecee20439d939d27cbdba208d1) by Daniyal Malik, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — modified (optimised: meshopt, simplified, WebP textures where present)
 
 ## License
 

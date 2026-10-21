@@ -56,7 +56,7 @@ describe('HeroStage', () => {
     stageView.set({ progress: 1 })
     const { unmount } = renderInSection()
     expect(stageView.get().progress).toBe(0)
-    expect(stageView.get().visible).toBe(true)
+    stageView.set({ visible: true }) // jsdom has no IntersectionObserver; stand in for the hero being on screen
     unmount()
     expect(stageView.get().visible).toBe(false)
   })

@@ -38,3 +38,14 @@ export function beamAim({ show, index, count, time, reduced }: { show: number; i
   }
   return { pan, tilt }
 }
+
+/**
+ * A hung moving head (lens on its +y, flipped upside down) aimed along the beam's (pan, tilt):
+ * `yaw` turns the yoke about world y, `tilt` the head about its own x. Same direction, real-fixture axes.
+ */
+export function headAngles({ pan, tilt }: { pan: number; tilt: number }) {
+  return {
+    yaw: Math.atan2(Math.sin(pan), Math.cos(pan) * Math.sin(tilt)),
+    tilt: Math.acos(Math.min(1, Math.cos(pan) * Math.cos(tilt))),
+  }
+}

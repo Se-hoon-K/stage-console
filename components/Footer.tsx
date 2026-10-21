@@ -1,4 +1,5 @@
 import { agency } from '@/content/agency'
+import { modelCredits } from '@/content/credits'
 
 export function Footer() {
   const { name, credits } = agency
@@ -21,6 +22,16 @@ export function Footer() {
           <a href={credits.repo} className="hover:text-ink">Source code</a>
         </li>
       </ul>
+      <p className="mt-6 max-w-3xl normal-case tracking-normal">
+        3D models, modified (optimised):{' '}
+        {modelCredits.map((m, i) => (
+          <span key={m.url}>
+            {i > 0 && ' · '}
+            <a href={m.url} className="hover:text-ink">{m.title}</a> by {m.author} (
+            <a href={m.licenceUrl} className="hover:text-ink">{m.licence}</a>)
+          </span>
+        ))}
+      </p>
     </footer>
   )
 }
