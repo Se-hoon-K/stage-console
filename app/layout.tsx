@@ -29,6 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Scene />
         <main id="main" className="relative z-10">{children}</main>
         <Footer />
+        <div id="shutter" aria-hidden="true" className="shutter" />
       </body>
     </html>
   )
