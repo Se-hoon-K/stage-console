@@ -22,6 +22,21 @@ describe('shutter', () => {
     expect(gsap.fromTo).toHaveBeenCalledTimes(1)
   })
 
+  it('resolves via the timeout when the tween never completes', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.mocked(gsap.fromTo).mockImplementation((() => {}) as never)
+      let done = false
+      void closeShutter().then(() => (done = true))
+      await vi.advanceTimersByTimeAsync(799)
+      expect(done).toBe(false)
+      await vi.advanceTimersByTimeAsync(1)
+      expect(done).toBe(true)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('does not open on first load (nothing was closed)', () => {
     openShutter()
     expect(gsap.fromTo).not.toHaveBeenCalled()

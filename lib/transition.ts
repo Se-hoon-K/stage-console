@@ -4,16 +4,25 @@ let closed = false
 const shutter = () => document.getElementById('shutter')
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+/** True from closeShutter until openShutter. */
+export const isTransitioning = () => closed
+
 /** Blackout: the shutter drops over the page. Resolves when the screen is covered. */
 export function closeShutter(): Promise<void> {
   const el = shutter()
   if (!el || reduced()) return Promise.resolve()
   closed = true
   return new Promise((resolve) => {
+    // Hidden tabs pause rAF so onComplete may never fire; the timeout keeps navigation alive.
+    const timer = window.setTimeout(resolve, 800)
+    const done = () => {
+      window.clearTimeout(timer)
+      resolve()
+    }
     gsap.fromTo(
       el,
       { scaleY: 0, transformOrigin: '50% 100%' },
-      { scaleY: 1, duration: 0.45, ease: 'power3.in', onComplete: () => resolve() },
+      { scaleY: 1, duration: 0.45, ease: 'power3.in', onComplete: done },
     )
   })
 }

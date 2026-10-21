@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { ComponentProps, MouseEvent } from 'react'
-import { closeShutter } from '@/lib/transition'
+import { closeShutter, isTransitioning, openShutter } from '@/lib/transition'
 
 type Props = Omit<ComponentProps<typeof Link>, 'href'> & { href: string }
 
@@ -17,7 +17,14 @@ export function TransitionLink({ href, onClick, target, ...rest }: Props) {
     const url = new URL(href, window.location.href)
     if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return
     e.preventDefault()
-    void closeShutter().then(() => router.push(href))
+    if (isTransitioning()) return
+    void closeShutter().then(() => {
+      try {
+        router.push(href)
+      } catch {
+        openShutter()
+      }
+    })
   }
 
   return <Link href={href} target={target} onClick={handle} {...rest} />
