@@ -41,6 +41,8 @@ export function useStageSection(ref: RefObject<HTMLElement | null>, { seed, end 
         end,
         pin: true,
         pinSpacer: spacer,
+        // Explicit: the spacer is display:flex (globals.css), which would otherwise turn pin spacing off.
+        pinSpacing: 'padding',
         scrub: true,
         onUpdate: (self) => apply(self.progress),
       })

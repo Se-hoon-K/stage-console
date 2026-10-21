@@ -11,7 +11,7 @@ export function Manifesto({ lines }: { lines: string[] }) {
     const el = ref.current
     if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
-      const split = SplitText.create(el.querySelectorAll('p'), { type: 'words' })
+      const split = SplitText.create(el.querySelectorAll('p'), { type: 'words', aria: 'none' }) // words stay real text; aria-label is not allowed on <p>
       gsap.fromTo(
         split.words,
         { color: 'rgba(237, 235, 230, 0)' },

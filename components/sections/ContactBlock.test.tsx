@@ -12,7 +12,10 @@ describe('formatCityTime', () => {
 describe('ContactBlock', () => {
   it('offers the email once to assistive tech and a booking link', () => {
     render(<ContactBlock />)
-    expect(screen.getByRole('link', { name: 'Email hello@example.com' })).toHaveAttribute('href', 'mailto:hello@example.com')
+    const email = screen.getByRole('link', { name: 'Email hello@example.com' })
+    expect(email).toHaveAttribute('href', 'mailto:hello@example.com')
+    // Name comes from text content (contains the visible email), not an aria-label that diverges from it.
+    expect(email).not.toHaveAttribute('aria-label')
     expect(screen.getByRole('link', { name: 'Book a show' })).toHaveAttribute('href', expect.stringContaining('mailto:hello@example.com'))
   })
 })

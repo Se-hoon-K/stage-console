@@ -22,7 +22,8 @@ export function ContactBlock() {
 
   return (
     <div className="mt-12">
-      <a href={`mailto:${agency.email}`} aria-label={`Email ${agency.email}`} className="marquee block overflow-hidden border-y border-line py-6">
+      <a href={`mailto:${agency.email}`} className="marquee block overflow-hidden border-y border-line py-6">
+        <span className="sr-only">Email {agency.email}</span>
         <span className="marquee-track" aria-hidden="true">
           {Array.from({ length: 4 }, (_, i) => (
             <span key={i} className="marquee-item">

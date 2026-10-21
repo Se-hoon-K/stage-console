@@ -73,6 +73,17 @@ describe('Preloader', () => {
     expect(container.querySelector('.preloader-count')).toHaveTextContent('100')
   })
 
+  it('does not wait for the WebGL stage (it mounts after load)', () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({} as never)
+    resetWebGLSupportCache()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame', 'performance'] })
+    const { container } = render(<Preloader />)
+    act(() => {
+      vi.advanceTimersByTime(1300)
+    })
+    expect(container.querySelector('.preloader-count')).toHaveTextContent('100')
+  })
+
   it('shows 100 immediately under reduced motion', () => {
     vi.mocked(window.matchMedia).mockImplementation(((q: string) => ({ matches: q.includes('reduce'), addEventListener() {}, removeEventListener() {} })) as never)
     const { container } = render(<Preloader />)
