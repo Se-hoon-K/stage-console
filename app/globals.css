@@ -210,3 +210,10 @@ body::after {
     animation: none;
   }
 }
+
+/* Hero title rises and dims as the stage assembles (decision a). --assembly is 0–1, set by useStageSection. */
+#cue-1 h1 {
+  transform: translateY(calc(var(--assembly, 0) * -22vh));
+  opacity: calc(1 - var(--assembly, 0) * 0.85);
+  will-change: transform, opacity;
+}
