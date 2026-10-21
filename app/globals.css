@@ -257,3 +257,18 @@ body::after {
   font-stretch: 125%;
   color: var(--color-led);
 }
+
+.work-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.work-link:focus-visible {
+  outline: none;
+}
+
+.work-row:has(.work-link:focus-visible) {
+  outline: 2px solid var(--color-led);
+  outline-offset: -2px;
+}
