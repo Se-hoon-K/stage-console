@@ -51,7 +51,7 @@ export default async function EventPage({ params }: Props) {
         <p className="label mb-6">
           {show.type} — {show.city}
         </p>
-        <h1 className="font-display text-[clamp(3.5rem,12vw,13rem)] font-black uppercase leading-[0.85] tracking-tight">{show.name}</h1>
+        <h1 tabIndex={-1} className="font-display text-[clamp(3.5rem,12vw,13rem)] font-black uppercase leading-[0.85] tracking-tight">{show.name}</h1>
         <ul aria-label="Show facts" className="mt-12 grid grid-cols-2 gap-px border border-line bg-line md:grid-cols-5">
           {facts.map(([label, value]) => (
             <li key={label} className="bg-stage p-4">

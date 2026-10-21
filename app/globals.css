@@ -21,6 +21,16 @@
   --console-h: 104px;
 }
 
+@media (max-width: 767px) {
+  :root {
+    --console-h: 57px;
+  }
+}
+
+h1[tabindex='-1']:focus {
+  outline: none;
+}
+
 html {
   background: var(--color-stage);
   color: var(--color-ink);

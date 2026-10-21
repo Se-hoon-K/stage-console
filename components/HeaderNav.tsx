@@ -1,11 +1,14 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { TransitionLink } from '@/components/TransitionLink'
 import { CUES } from '@/content/cues'
+import { scrollToCue } from '@/lib/scroll'
 
 export function HeaderNav() {
   const [open, setOpen] = useState(false)
+  const home = usePathname() === '/'
   const btn = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     if (!open) return
@@ -25,7 +28,11 @@ export function HeaderNav() {
       <ul id="main-nav-list" data-open={open} className="label header-nav-list">
         {CUES.map((c) => (
           <li key={c.n}>
-            <TransitionLink href={`/#cue-${c.n}`} className="hover:text-ink" onClick={() => setOpen(false)}>
+            <TransitionLink href={`/#cue-${c.n}`} className="hover:text-ink" onClick={(e) => {
+                setOpen(false)
+                if (home && scrollToCue(c.n)) e.preventDefault()
+              }}
+            >
               {c.label}
             </TransitionLink>
           </li>

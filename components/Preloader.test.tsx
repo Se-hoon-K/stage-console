@@ -72,4 +72,10 @@ describe('Preloader', () => {
     })
     expect(container.querySelector('.preloader-count')).toHaveTextContent('100')
   })
+
+  it('shows 100 immediately under reduced motion', () => {
+    vi.mocked(window.matchMedia).mockImplementation(((q: string) => ({ matches: q.includes('reduce'), addEventListener() {}, removeEventListener() {} })) as never)
+    const { container } = render(<Preloader />)
+    expect(container.querySelector('.preloader-count')).toHaveTextContent('100')
+  })
 })

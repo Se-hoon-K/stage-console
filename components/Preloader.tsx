@@ -64,6 +64,27 @@ export function Preloader() {
       fallback = window.setTimeout(() => setDone(true), 1500)
     }
 
+    if (reduced) {
+      // No counting: show the full state and fade out as soon as the stage is ready (or at the 3 s cap).
+      if (counter.current) counter.current.textContent = '100'
+      root.current?.style.setProperty('--lit', String(CHANNELS))
+      const poll = window.setInterval(() => {
+        if (fontsReady && (!webgl || stageView.get().webglReady)) {
+          window.clearInterval(poll)
+          finish()
+        }
+      }, 50)
+      const cap = window.setTimeout(() => {
+        window.clearInterval(poll)
+        if (!finished) finish()
+      }, 3000)
+      return () => {
+        window.clearInterval(poll)
+        window.clearTimeout(cap)
+        window.clearTimeout(fallback)
+      }
+    }
+
     const tick = (now: number) => {
       const ready = fontsReady && (!webgl || stageView.get().webglReady)
       const pct = preloadPercent(now - start, ready)

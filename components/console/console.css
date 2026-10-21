@@ -230,10 +230,6 @@
 }
 
 @media (max-width: 767px) {
-  :root {
-    --console-h: 56px;
-  }
-
   .console {
     flex-direction: column;
     height: auto;

@@ -14,9 +14,14 @@ import './globals.css'
 const archivo = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-archivo', display: 'swap' })
 const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-plex-mono', display: 'swap' })
 
+const title = `${agency.name} — Event production (portfolio piece)`
+const description = `${agency.name} is a fictional event production agency. A portfolio piece designed and developed by ${agency.credits.author}.`
+
 export const metadata: Metadata = {
-  title: `${agency.name} — Event production (portfolio piece)`,
-  description: `${agency.name} is a fictional event production agency. A portfolio piece designed and developed by ${agency.credits.author}.`,
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  title,
+  description,
+  openGraph: { title, description, type: 'website' },
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
