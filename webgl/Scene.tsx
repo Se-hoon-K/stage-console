@@ -12,11 +12,12 @@ const noSubscribe = () => () => {}
 const INTERACTIONS = ['scroll', 'wheel', 'pointerdown', 'keydown', 'touchstart'] as const
 
 /**
- * Calls `fn` (in an idle callback) on the visitor's first interaction, or `fallbackMs` after load,
- * whichever comes first. Keeps the WebGL scene build and shader compile out of hydration and the
- * load window; the SVG stage covers until then.
+ * Calls `fn` (in an idle callback) on the visitor's first interaction, or `fallbackMs` after this call
+ * (i.e. after hydration), whichever comes first. Keeps the WebGL scene build and shader compile out of
+ * hydration; the SVG stage covers until then. Not tied to window.load, which can take seconds on slow
+ * connections or a dev server and left the drawing up far too long.
  */
-export function whenStageCanMount(fn: () => void, fallbackMs = 4000) {
+export function whenStageCanMount(fn: () => void, fallbackMs = 2500) {
   let idle = 0
   let timer = 0
   let fired = false
@@ -27,15 +28,12 @@ export function whenStageCanMount(fn: () => void, fallbackMs = 4000) {
     if (window.requestIdleCallback) idle = window.requestIdleCallback(fn, { timeout: 500 })
     else timer = window.setTimeout(fn, 0)
   }
-  const arm = () => (timer = window.setTimeout(go, fallbackMs))
   const cleanup = () => {
-    window.removeEventListener('load', arm)
     for (const e of INTERACTIONS) window.removeEventListener(e, go)
     window.clearTimeout(timer)
   }
   for (const e of INTERACTIONS) window.addEventListener(e, go, { once: true, passive: true })
-  if (document.readyState === 'complete') arm()
-  else window.addEventListener('load', arm, { once: true })
+  timer = window.setTimeout(go, fallbackMs)
   return () => {
     cleanup()
     if (idle) window.cancelIdleCallback(idle)

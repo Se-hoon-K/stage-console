@@ -24,16 +24,23 @@ describe('whenStageCanMount', () => {
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
-  it('falls back to a timer that starts at the load event', () => {
+  it('falls back to a timer that starts right away, even before the load event', () => {
     vi.spyOn(document, 'readyState', 'get').mockReturnValue('loading')
     const fn = vi.fn()
-    whenStageCanMount(fn, 4000)
-    vi.advanceTimersByTime(10_000)
-    expect(fn).not.toHaveBeenCalled()
-    window.dispatchEvent(new Event('load'))
-    vi.advanceTimersByTime(3999)
+    whenStageCanMount(fn, 1500)
+    vi.advanceTimersByTime(1499)
     expect(fn).not.toHaveBeenCalled()
     vi.advanceTimersByTime(10)
+    expect(fn).toHaveBeenCalledTimes(1)
+  })
+
+  it('mounts on an interaction before the timer, and only once', () => {
+    const fn = vi.fn()
+    whenStageCanMount(fn, 1500)
+    window.dispatchEvent(new Event('wheel'))
+    vi.advanceTimersByTime(10)
+    expect(fn).toHaveBeenCalledTimes(1)
+    vi.advanceTimersByTime(5000)
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
