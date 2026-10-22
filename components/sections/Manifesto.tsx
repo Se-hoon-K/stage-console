@@ -4,7 +4,11 @@ import { useEffect, useRef } from 'react'
 import { gsap, SplitText } from '@/lib/gsap'
 import { useStageBackdrop } from '@/stage/useStageBackdrop'
 
-/** Words fill in from outline as the section scrolls through, like lights being raised. */
+/**
+ * Statement, body, kicker: the first line is the big uppercase statement whose words fill in from outline
+ * as the section scrolls (like lights being raised); the middle lines read as body copy; the last line
+ * lands as an LED-coloured kicker.
+ */
 export function Manifesto({ lines }: { lines: string[] }) {
   const ref = useRef<HTMLDivElement>(null)
   useStageBackdrop(ref)
@@ -13,7 +17,7 @@ export function Manifesto({ lines }: { lines: string[] }) {
     const el = ref.current
     if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
-      const split = SplitText.create(el.querySelectorAll('p'), { type: 'words', aria: 'none' }) // words stay real text; aria-label is not allowed on <p>
+      const split = SplitText.create(el.querySelectorAll('.manifesto'), { type: 'words', aria: 'none' }) // words stay real text; aria-label is not allowed on <p>
       gsap.fromTo(
         split.words,
         { color: 'rgba(237, 235, 230, 0)' },
@@ -28,11 +32,15 @@ export function Manifesto({ lines }: { lines: string[] }) {
     return () => ctx.revert()
   }, [])
 
+  const [statement, ...rest] = lines
+  const kicker = rest.length > 0 ? rest[rest.length - 1] : undefined
+  const body = rest.slice(0, -1)
+
   return (
-    <div ref={ref} className="manifesto mt-12 max-w-5xl space-y-2">
-      {lines.map((line) => (
-        <p key={line}>{line}</p>
-      ))}
+    <div ref={ref} className="mt-12 max-w-5xl space-y-8 md:space-y-10">
+      <p className="manifesto">{statement}</p>
+      {body.length > 0 && <p className="manifesto-body">{body.join(' ')}</p>}
+      {kicker && <p className="manifesto-kicker">{kicker}</p>}
     </div>
   )
 }
