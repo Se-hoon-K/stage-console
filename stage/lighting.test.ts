@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { beamAim, headAngles, lightLevel } from './lighting'
+import { beamAim, fixtureHsl, headAngles, lightLevel } from './lighting'
 
 describe('lightLevel', () => {
   const base = { index: 0, count: 8, time: 0, tempo: 120 }
@@ -92,5 +92,24 @@ describe('headAngles', () => {
       const want = beamDir(pan, tilt)
       headDir(headAngles({ pan, tilt })).forEach((v, k) => expect(v).toBeCloseTo(want[k]))
     }
+  })
+})
+
+describe('fixtureHsl', () => {
+  it('makes floor pars warm white with a hint of the hue', () => {
+    const [, s, l] = fixtureHsl(8, true)
+    expect(s).toBeLessThan(0.3)
+    expect(l).toBeGreaterThanOrEqual(0.85)
+  })
+
+  it('keeps hung heads coloured but softer than full saturation', () => {
+    const [, s] = fixtureHsl(8, false)
+    expect(s).toBeGreaterThanOrEqual(0.6)
+    expect(s).toBeLessThanOrEqual(0.85)
+  })
+
+  it('follows the console hue for both', () => {
+    expect(fixtureHsl(200, false)[0]).not.toBe(fixtureHsl(8, false)[0])
+    expect(fixtureHsl(200, true)[0]).not.toBe(fixtureHsl(8, true)[0])
   })
 })
