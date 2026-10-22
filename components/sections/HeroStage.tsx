@@ -35,6 +35,7 @@ export function HeroStage() {
   return (
     <div ref={ref} className="pointer-events-none absolute inset-0 -z-10">
       <StageSvg
+        draw
         stage={stage}
         hue={hue}
         className={`absolute inset-x-0 top-[14%] mx-auto h-[55%] w-full transition-opacity duration-700 ${webglReady ? 'opacity-0' : 'opacity-100'}`}

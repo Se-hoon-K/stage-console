@@ -362,3 +362,51 @@ html[data-preloaded] .preloader {
   position: relative;
   background: linear-gradient(to bottom, color-mix(in oklab, var(--color-stage) 35%, transparent), color-mix(in oklab, var(--color-stage) 80%, transparent) 40%, var(--color-stage));
 }
+
+/* Blueprint intro: while the 3D stage loads, its elevation draws itself in — grid, then parts in assembly
+   order, then the lights — and the canvas fades in over it. JS + motion only; otherwise it is static. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-js] .stage-blueprint .blueprint-grid {
+    opacity: 0;
+    animation: blueprint-fade 0.6s ease-out forwards;
+  }
+  [data-js] .stage-blueprint rect:not(.blueprint-grid) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    fill-opacity: 0;
+    animation:
+      blueprint-draw 0.7s cubic-bezier(0.6, 0, 0.2, 1) forwards,
+      blueprint-fill 0.5s ease-out forwards;
+    animation-delay: calc(0.2s + var(--i, 0) * 45ms), calc(0.6s + var(--i, 0) * 45ms);
+  }
+  [data-js] .stage-blueprint circle {
+    opacity: 0;
+    transform: scale(0.2);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: blueprint-dot 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+    animation-delay: calc(1.4s + var(--i, 0) * 30ms);
+  }
+}
+
+@keyframes blueprint-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes blueprint-fill {
+  to {
+    fill-opacity: 1;
+  }
+}
+@keyframes blueprint-fade {
+  to {
+    opacity: 0.5;
+  }
+}
+@keyframes blueprint-dot {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

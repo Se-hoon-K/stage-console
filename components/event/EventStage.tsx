@@ -21,6 +21,7 @@ export function EventStage({ seed, name }: { seed: number; name: string }) {
     <div data-pin-spacer>
     <section ref={ref} aria-label={`${name} stage`} className="relative isolate h-[calc(100svh-var(--console-h))]">
       <StageSvg
+        draw
         stage={stage}
         hue={hue}
         className={`absolute inset-x-0 top-[12%] mx-auto h-[60%] w-full transition-opacity duration-700 ${webglReady ? 'opacity-0' : 'opacity-100'}`}

@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useStageView } from '@/stage/view'
 import { canUseWebGL } from './support'
 import { WebGLBoundary } from './WebGLBoundary'
 
@@ -47,9 +48,14 @@ export function Scene() {
   const supported = useSyncExternalStore(noSubscribe, canUseWebGL, () => false)
   // The SVG stage shows until the canvas reports webglReady.
   const [deferred, setDeferred] = useState(false)
+  const ready = useStageView((s) => s.webglReady)
   useEffect(() => (supported ? whenStageCanMount(() => setDeferred(true)) : undefined), [supported])
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
+    <div
+      aria-hidden="true"
+      // Fades in over the blueprint drawing, which fades out in step (HeroStage/EventStage).
+      className={`pointer-events-none fixed inset-0 z-0 transition-opacity duration-700 ${ready ? 'opacity-100' : 'opacity-0'}`}
+    >
       {supported && deferred && (
         <WebGLBoundary>
           <StageCanvas />
