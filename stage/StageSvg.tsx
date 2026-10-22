@@ -1,6 +1,9 @@
 import { memo, useMemo } from 'react'
 import { toElevation } from './elevation'
 import type { Stage } from './generateStage'
+import { fixtureHsl, HUNG_MIN_HEIGHT } from './lighting'
+
+const hsl = ([h, s, l]: [number, number, number]) => `hsl(${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%)`
 
 type Props = { stage: Stage; hue: number; className?: string }
 
@@ -25,7 +28,7 @@ export const StageSvg = memo(function StageSvg({ stage, hue, className }: Props)
         />
       ))}
       {el.lights.map((l) => (
-        <circle key={l.id} cx={l.cx} cy={l.cy} r={l.r} fill={`hsl(${Math.round(hue)} 100% 60%)`} />
+        <circle key={l.id} cx={l.cx} cy={l.cy} r={l.r} fill={hsl(fixtureHsl(hue, -l.cy <= HUNG_MIN_HEIGHT))} />
       ))}
     </svg>
   )

@@ -10,7 +10,7 @@ import { onPadHit } from '@/console/padEvents'
 import { consoleStore } from '@/console/store'
 import { ASSEMBLY_END, lightsOn, partOffset, showProgress } from '@/stage/assembly'
 import { generateStage, type Part } from '@/stage/generateStage'
-import { beamAim, headAngles, lightLevel } from '@/stage/lighting'
+import { beamAim, fixtureHsl, headAngles, HUNG_MIN_HEIGHT, lightLevel } from '@/stage/lighting'
 import { hangs, trussTiles, type Tile } from '@/stage/tiling'
 import { fitDistance } from '@/stage/camera'
 import { stageView, useStageView } from '@/stage/view'
@@ -22,7 +22,6 @@ import { createFlareTexture } from './flare'
 type BodyKind = 'deck' | 'truss' | 'speaker' | 'screen'
 const BODY_KINDS: BodyKind[] = ['deck', 'truss', 'speaker', 'screen']
 const BODY_COLORS: Record<BodyKind, string> = { deck: '#262626', truss: '#1c1c1c', speaker: '#111111', screen: '#0a0a0a' }
-const BEAM_MIN_HEIGHT = 3
 const NO_AIM = { pan: 0, tilt: 0 }
 const SEGMENT = 2 // truss segment length, m
 const HEAD_SIZE = 0.6 // moving-head height, m
@@ -35,6 +34,8 @@ const LENS_PAR = 0.6
 const obj = new THREE.Object3D()
 const col = new THREE.Color()
 const hueCol = new THREE.Color()
+const hungCol = new THREE.Color()
+const floorCol = new THREE.Color()
 const camTarget = new THREE.Vector3()
 const toCam = new THREE.Vector3()
 const scaleV = new THREE.Vector3()
@@ -122,8 +123,8 @@ function Environment() {
 function Rig({ lights, reduced, assets }: { lights: Part[]; reduced: boolean; assets: StageAssets }) {
   const head = assets.movingHead
   const par = assets.par
-  const hungIdx = useMemo(() => lights.flatMap((p, i) => (p.position[1] > BEAM_MIN_HEIGHT ? [i] : [])), [lights])
-  const deckIdx = useMemo(() => lights.flatMap((p, i) => (p.position[1] > BEAM_MIN_HEIGHT ? [] : [i])), [lights])
+  const hungIdx = useMemo(() => lights.flatMap((p, i) => (p.position[1] > HUNG_MIN_HEIGHT ? [i] : [])), [lights])
+  const deckIdx = useMemo(() => lights.flatMap((p, i) => (p.position[1] > HUNG_MIN_HEIGHT ? [] : [i])), [lights])
   const lensRef = useRef<THREE.InstancedMesh>(null)
   const flareRef = useRef<THREE.InstancedMesh>(null)
   const beamRef = useRef<THREE.InstancedMesh>(null)
@@ -133,6 +134,7 @@ function Rig({ lights, reduced, assets }: { lights: Part[]; reduced: boolean; as
     const g = new THREE.CylinderGeometry(0.04, 0.13, 1, 48, 24, true)
     g.translate(0, -0.5, 0) // narrow end at the fixture, wide end 1 unit below
     g.setAttribute('aLevel', new THREE.InstancedBufferAttribute(new Float32Array(lights.length), 1))
+    g.setAttribute('aColor', new THREE.InstancedBufferAttribute(new Float32Array(lights.length * 3), 3))
     return g
   }, [lights.length])
   const beamMaterial = useMemo(() => createBeamMaterial(), [])
@@ -167,13 +169,15 @@ function Rig({ lights, reduced, assets }: { lights: Part[]; reduced: boolean; as
     const c = consoleStore.get()
     const time = state.clock.elapsedTime
     const show = showProgress(progress)
-    hueCol.setHSL(c.hue / 360, 1, 0.55)
+    hueCol.setHSL(c.hue / 360, 0.75, 0.55) // fill-light spill
+    hungCol.setHSL(...fixtureHsl(c.hue, false))
+    floorCol.setHSL(...fixtureHsl(c.hue, true))
     // Read material/geometry back off the mesh so the compiler sees no mutation of memoised values.
     const mat = beams.material as THREE.ShaderMaterial
-    mat.uniforms.uColor.value.copy(hueCol)
     mat.uniforms.uTime.value = reduced ? 0 : time % 256 // still haze under reduced motion; bounded for mobile float precision
     mat.uniforms.uHaze.value = c.fog
     const levels = beams.geometry.getAttribute('aLevel') as THREE.InstancedBufferAttribute
+    const colors = beams.geometry.getAttribute('aColor') as THREE.InstancedBufferAttribute
 
     let sum = 0
     for (let i = 0; i < lights.length; i++) {
@@ -187,7 +191,9 @@ function Rig({ lights, reduced, assets }: { lights: Part[]; reduced: boolean; as
       sum += level
 
       placePart(p, progress)
-      const hung = p.position[1] > BEAM_MIN_HEIGHT
+      const hung = p.position[1] > HUNG_MIN_HEIGHT
+      const tint = hung ? hungCol : floorCol
+      colors.setXYZ(i, tint.r, tint.g, tint.b)
       const aim = hung ? beamAim({ show, index: i, count: lights.length, time, reduced }) : NO_AIM
       let lensScale = 1
       if (hung && head) {
@@ -220,7 +226,7 @@ function Rig({ lights, reduced, assets }: { lights: Part[]; reduced: boolean; as
       obj.scale.setScalar(lensScale)
       obj.updateMatrix()
       lens.setMatrixAt(i, obj.matrix)
-      lens.setColorAt(i, col.copy(hueCol).multiplyScalar(0.15 + level * 2.5))
+      lens.setColorAt(i, col.copy(tint).multiplyScalar(0.15 + level * 2.5))
 
       obj.scale.set(h, h, h)
       obj.updateMatrix()
@@ -232,10 +238,11 @@ function Rig({ lights, reduced, assets }: { lights: Part[]; reduced: boolean; as
       obj.scale.setScalar(0.4 + level * 0.9)
       obj.updateMatrix()
       flares.setMatrixAt(i, obj.matrix)
-      flares.setColorAt(i, col.copy(hueCol).multiplyScalar(level))
+      flares.setColorAt(i, col.copy(tint).multiplyScalar(level))
     }
 
     levels.needsUpdate = true
+    colors.needsUpdate = true
     lens.instanceMatrix.needsUpdate = true
     if (lens.instanceColor) lens.instanceColor.needsUpdate = true
     flares.instanceMatrix.needsUpdate = true

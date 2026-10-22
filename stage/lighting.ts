@@ -1,5 +1,8 @@
 import { lightsOn } from './assembly'
 
+/** Lights above this height (m) hang from the rig; below it they stand on the deck. */
+export const HUNG_MIN_HEIGHT = 3
+
 type Args = { progress: number; index: number; count: number; time: number; tempo: number }
 
 /** Light chase: each light pulses once per beat, phase-shifted along the rig. */
@@ -48,4 +51,9 @@ export function headAngles({ pan, tilt }: { pan: number; tilt: number }) {
     yaw: Math.atan2(Math.sin(pan), Math.cos(pan) * Math.sin(tilt)),
     tilt: Math.acos(Math.min(1, Math.cos(pan) * Math.cos(tilt))),
   }
+}
+
+/** HSL (0–1) for a fixture: hung heads follow the console hue, softened; floor pars are warm white with a hint of it. */
+export function fixtureHsl(hue: number, floor: boolean): [number, number, number] {
+  return floor ? [hue / 360, 0.25, 0.88] : [hue / 360, 0.75, 0.6]
 }

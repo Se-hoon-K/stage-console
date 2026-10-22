@@ -7,16 +7,19 @@ export function createBeamMaterial() {
     depthWrite: false,
     blending: THREE.AdditiveBlending,
     side: THREE.DoubleSide,
-    uniforms: { uColor: { value: new THREE.Color() }, uTime: { value: 0 }, uHaze: { value: 0.5 } },
+    uniforms: { uTime: { value: 0 }, uHaze: { value: 0.5 } },
     vertexShader: /* glsl */ `
       attribute float aLevel;
+      attribute vec3 aColor;
       varying float vLevel;
+      varying vec3 vColor;
       varying float vY;
       varying vec3 vNormalV;
       varying vec3 vViewPos;
       varying vec3 vLocal;
       void main() {
         vLevel = aLevel;
+        vColor = aColor;
         vY = position.y;
         vLocal = position;
         vec4 local = vec4(position, 1.0);
@@ -32,10 +35,10 @@ export function createBeamMaterial() {
       }
     `,
     fragmentShader: /* glsl */ `
-      uniform vec3 uColor;
       uniform float uTime;
       uniform float uHaze;
       varying float vLevel;
+      varying vec3 vColor;
       varying float vY;
       varying vec3 vNormalV;
       varying vec3 vViewPos;
@@ -57,7 +60,7 @@ export function createBeamMaterial() {
         float haze = 0.55 + 0.45 * noise(vec3(vLocal.xz * 3.0, vY * 2.0 - uTime * 0.25));
         float gobo = 0.85 + 0.15 * sin(atan(vLocal.z, vLocal.x) * 6.0);
         float density = 0.2 + 0.45 * uHaze;
-        gl_FragColor = vec4(uColor * vLevel * soft * along * haze * gobo * density, 1.0);
+        gl_FragColor = vec4(vColor * vLevel * soft * along * haze * gobo * density, 1.0);
       }
     `,
   })
